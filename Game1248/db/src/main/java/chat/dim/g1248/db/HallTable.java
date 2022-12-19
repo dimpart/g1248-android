@@ -9,6 +9,42 @@ import chat.dim.g1248.dbi.HallDBI;
 import chat.dim.g1248.model.Table;
 import chat.dim.protocol.ID;
 
+/**
+ *  Game Table
+ *  ~~~~~~~~~~
+ *
+ *  JSON: {
+ *      tid    : {TABLE_ID},
+ *      // current playing boards
+ *      boards : [
+ *          {
+ *              bid    : {BOARD_ID},     // 0, 1, 2, 3
+ *              player : "{PLAYER_ID}",  // current player
+ *
+ *              // details, will not show in hall
+ *              gid    : {GAME_ID},      // game id
+ *              score  : 10000,          // current sore
+ *              state  : [               // current state
+ *                  0, 1, 2, 4,
+ *                  0, 1, 2, 4,
+ *                  0, 1, 2, 4,
+ *                  0, 1, 2, 4
+ *              ],
+ *              size   : "4*4"
+ *          },
+ *          //...
+ *      ],
+ *      // score of the winner in this table, may be null
+ *      best   : {
+ *          bid    : {BOARD_ID},
+ *          gid    : {GAME_ID},      // game id
+ *          player : "{PLAYER_ID}",  // game player
+ *          score  : 10000,          // game sore
+ *          time   : {TIMESTAMP}
+ *      }
+ *  }
+ */
+
 public class HallTable implements HallDBI {
 
     @Override

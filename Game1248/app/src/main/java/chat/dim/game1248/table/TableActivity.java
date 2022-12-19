@@ -66,26 +66,13 @@ public class TableActivity extends AppCompatActivity {
         }
     };
     private boolean mVisible;
-    private final Runnable mHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            hide();
-        }
-    };
+    private final Runnable mHideRunnable = this::hide;
     /**
      * Touch listener to use for in-layout UI controls to delay hiding the
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
-        }
-    };
+    private final View.OnTouchListener mDelayHideTouchListener = this::onTouch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +97,31 @@ public class TableActivity extends AppCompatActivity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+
+        if (savedInstanceState == null) {
+            boardFragment = BoardFragment.newInstance();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_board, boardFragment)
+                    .commitNow();
+            boardsFragment1 = BoardsFragment.newInstance();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.board1, boardsFragment1)
+                    .commitNow();
+            boardsFragment2 = BoardsFragment.newInstance();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.board2, boardsFragment2)
+                    .commitNow();
+            boardsFragment3 = BoardsFragment.newInstance();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.board3, boardsFragment3)
+                    .commitNow();
+        }
     }
+
+    private BoardFragment boardFragment = null;
+    private BoardsFragment boardsFragment1 = null;
+    private BoardsFragment boardsFragment2 = null;
+    private BoardsFragment boardsFragment3 = null;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -163,5 +174,12 @@ public class TableActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    private boolean onTouch(View view, MotionEvent motionEvent) {
+        if (AUTO_HIDE) {
+            delayedHide(AUTO_HIDE_DELAY_MILLIS);
+        }
+        return false;
     }
 }

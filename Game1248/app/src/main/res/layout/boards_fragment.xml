@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:context=".table.BoardsFragment">
+
+    <GridView
+        android:id="@+id/board_grid_view"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:background="#CDDC39"
+        android:choiceMode="none"
+        android:clickable="false"
+        android:columnWidth="32dp"
+        android:focusable="true"
+        android:horizontalSpacing="1dp"
+        android:minWidth="32dp"
+        android:minHeight="32dp"
+        android:numColumns="4"
+        android:overScrollMode="never"
+        android:scrollbarAlwaysDrawHorizontalTrack="false"
+        android:scrollbarAlwaysDrawVerticalTrack="false"
+        android:scrollbars="none"
+        android:stretchMode="none"
+        android:verticalSpacing="1dp"
+        tools:listitem="@layout/griditem_squares">
+
+    </GridView>
+
+</FrameLayout>

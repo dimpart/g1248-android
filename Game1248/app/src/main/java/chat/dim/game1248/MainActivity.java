@@ -22,11 +22,17 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 
 import chat.dim.game1248.hall.TablesFragment;
+import chat.dim.threading.MainThread;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private TablesFragment tablesFragment = null;
+
+    public MainActivity() {
+        super();
+        MainThread.prepare();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

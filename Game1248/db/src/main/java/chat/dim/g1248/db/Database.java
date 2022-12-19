@@ -11,6 +11,7 @@ import chat.dim.dbi.MessageDBI;
 import chat.dim.dbi.SessionDBI;
 import chat.dim.g1248.GlobalVariable;
 import chat.dim.g1248.dbi.HallDBI;
+import chat.dim.g1248.dbi.TableDBI;
 import chat.dim.protocol.Document;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.LoginCommand;
@@ -28,10 +29,12 @@ public enum Database implements AccountDBI, MessageDBI, SessionDBI {
     }
 
     public HallDBI hallTable;
+    public TableDBI tableTable;
 
     Database() {
 
         hallTable = new HallTable();
+        tableTable = new TableTable();
 
         GlobalVariable shared = GlobalVariable.getInstance();
         shared.adb = this;

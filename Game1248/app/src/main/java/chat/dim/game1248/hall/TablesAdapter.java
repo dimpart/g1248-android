@@ -10,6 +10,8 @@ import android.widget.ImageView;
 
 import androidx.cardview.widget.CardView;
 
+import java.util.List;
+
 import chat.dim.format.JSON;
 import chat.dim.g1248.model.Table;
 import chat.dim.game1248.R;
@@ -27,7 +29,7 @@ public class TablesAdapter extends ArrayAdapter<Table> {
 //        super(context, resource, textViewResourceId);
 //    }
 
-    TablesAdapter(Context context, int resource, Table[] objects) {
+    TablesAdapter(Context context, int resource, List<Table> objects) {
         super(context, resource, objects);
         resId = resource;
     }
