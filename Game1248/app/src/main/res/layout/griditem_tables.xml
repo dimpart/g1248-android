@@ -5,12 +5,12 @@
     android:layout_height="match_parent">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+        android:id="@+id/card_view"
         android:layout_width="128dp"
         android:layout_height="128dp" >
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/table_image_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:srcCompat="@android:drawable/ic_menu_mylocation" />

@@ -1,15 +1,19 @@
 package chat.dim.game1248.hall;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 
 import androidx.cardview.widget.CardView;
 
+import chat.dim.format.JSON;
 import chat.dim.g1248.model.Table;
 import chat.dim.game1248.R;
+import chat.dim.game1248.table.TableActivity;
 
 public class TablesAdapter extends ArrayAdapter<Table> {
 
@@ -23,7 +27,7 @@ public class TablesAdapter extends ArrayAdapter<Table> {
 //        super(context, resource, textViewResourceId);
 //    }
 
-    public TablesAdapter(Context context, int resource, Table[] objects) {
+    TablesAdapter(Context context, int resource, Table[] objects) {
         super(context, resource, objects);
         resId = resource;
     }
@@ -48,7 +52,8 @@ public class TablesAdapter extends ArrayAdapter<Table> {
         if (convertView == null) {
             view = LayoutInflater.from(getContext()).inflate(resId, null);
             viewHolder = new ViewHolder();
-            viewHolder.cardView = view.findViewById(R.id.cardView);
+            viewHolder.cardView = view.findViewById(R.id.card_view);
+            viewHolder.tableImageView = view.findViewById(R.id.table_image_view);
             view.setTag(viewHolder);
         } else {
             view = convertView;
@@ -66,6 +71,10 @@ public class TablesAdapter extends ArrayAdapter<Table> {
 
         CardView cardView = null;
 
+        ImageView tableImageView = null;
+
+        private Table table = null;
+
         ViewHolder() {
         }
 
@@ -75,7 +84,19 @@ public class TablesAdapter extends ArrayAdapter<Table> {
         }
 
         private void showTable(Table table) {
+            this.table = table;
 
+            tableImageView.setOnClickListener(view -> clickTable());
+        }
+
+        private void clickTable() {
+            String json = JSON.encode(table.toMap());
+
+            Context content = getContext();
+            Intent intent = new Intent();
+            intent.setClass(content, TableActivity.class);
+            intent.putExtra("table", json);
+            content.startActivity(intent);
         }
     }
 }

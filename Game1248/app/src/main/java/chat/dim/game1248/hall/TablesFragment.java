@@ -34,7 +34,7 @@ public class TablesFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_main, container, false);
 
-        tablesView = view.findViewById(R.id.tablesView);
+        tablesView = view.findViewById(R.id.tables_view);
 
         return view;
     }

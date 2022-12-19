@@ -9,7 +9,7 @@
     tools:showIn="@layout/app_bar_main">
 
     <GridView
-        android:id="@+id/tablesView"
+        android:id="@+id/tables_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:columnWidth="128dp"
