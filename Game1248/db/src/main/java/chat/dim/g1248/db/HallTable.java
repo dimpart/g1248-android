@@ -49,9 +49,16 @@ public class HallTable implements HallDBI {
 
     @Override
     public List<Table> getTables(int start, int end) {
+        assert 0 <= start && start < end : "range error: " + start + ", " + end;
+        // TODO: load tables from local storage
+
+        return testTables();
+    }
+
+    // FIXME:
+    private static List<Table> testTables() {
         List<Table> tables = new ArrayList<>();
 
-        // TODO: load tables from local storage
         int tableCount = 20;
         int boardCount = 4;
 

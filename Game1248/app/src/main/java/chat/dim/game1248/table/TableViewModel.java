@@ -6,6 +6,7 @@ import java.util.List;
 
 import chat.dim.g1248.db.Database;
 import chat.dim.g1248.model.Board;
+import chat.dim.g1248.model.History;
 
 public class TableViewModel extends ViewModel {
 
@@ -36,5 +37,13 @@ public class TableViewModel extends ViewModel {
         } else {
             return candidate;
         }
+    }
+
+    public void saveHistory(History history) {
+        database.historyTable.saveHistory(history);
+    }
+    public History getHistory(int gid) {
+        assert gid > 0 : "game history ID error: " + gid;
+        return database.historyTable.getHistory(gid);
     }
 }

@@ -10,8 +10,7 @@ import chat.dim.dbi.AccountDBI;
 import chat.dim.dbi.MessageDBI;
 import chat.dim.dbi.SessionDBI;
 import chat.dim.g1248.GlobalVariable;
-import chat.dim.g1248.dbi.HallDBI;
-import chat.dim.g1248.dbi.TableDBI;
+import chat.dim.http.HTTPClient;
 import chat.dim.protocol.Document;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.LoginCommand;
@@ -28,18 +27,23 @@ public enum Database implements AccountDBI, MessageDBI, SessionDBI {
         return INSTANCE;
     }
 
-    public HallDBI hallTable;
-    public TableDBI tableTable;
+    public HallTable hallTable;
+    public TableTable tableTable;
+    public HistoryTable historyTable;
 
     Database() {
 
         hallTable = new HallTable();
         tableTable = new TableTable();
+        historyTable = new HistoryTable();
 
         GlobalVariable shared = GlobalVariable.getInstance();
         shared.adb = this;
         shared.mdb = this;
         shared.sdb = this;
+
+        // initialize all factories & plugins
+        HTTPClient.getInstance();
     }
 
     //

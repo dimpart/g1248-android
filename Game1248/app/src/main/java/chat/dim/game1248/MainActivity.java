@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import android.os.Environment;
 import android.view.View;
 
 import androidx.core.view.GravityCompat;
@@ -21,6 +22,11 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
 
+import java.io.File;
+
+import chat.dim.filesys.ExternalStorage;
+import chat.dim.format.Base64;
+import chat.dim.format.DataCoder;
 import chat.dim.game1248.hall.TablesFragment;
 import chat.dim.threading.MainThread;
 
@@ -120,5 +126,24 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    static {
+        // android.Base64
+        Base64.coder = new DataCoder() {
+            @Override
+            public String encode(byte[] data) {
+                return android.util.Base64.encodeToString(data, android.util.Base64.DEFAULT);
+            }
+
+            @Override
+            public byte[] decode(String string) {
+                return android.util.Base64.decode(string, android.util.Base64.DEFAULT);
+            }
+        };
+
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+        path += File.separator + "chat.dim.g1248";
+        ExternalStorage.setRoot(path);
     }
 }

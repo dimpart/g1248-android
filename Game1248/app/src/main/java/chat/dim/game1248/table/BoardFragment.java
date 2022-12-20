@@ -12,12 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import chat.dim.g1248.model.Board;
+import chat.dim.g1248.model.History;
 import chat.dim.g1248.model.Square;
+import chat.dim.g1248.model.State;
 import chat.dim.game1248.R;
 import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
@@ -27,16 +29,19 @@ public class BoardFragment extends Fragment {
     TableViewModel mViewModel = null;
     private BoardAdapter adapter = null;
 
+    private TextView scoreView = null;
     private GridView boardView = null;
 
     int tableId;
     int boardId;
+    int score;
     final List<Integer> state = new ArrayList<>();
 
     public BoardFragment(int tid, int bid) {
         super();
         tableId = tid;
         boardId = bid;
+        score = 0;
     }
 
     @Override
@@ -44,6 +49,7 @@ public class BoardFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.board_fragment, container, false);
 
+        scoreView = view.findViewById(R.id.score_text_view);
         boardView = view.findViewById(R.id.board_grid_view);
 
         return view;
@@ -63,11 +69,13 @@ public class BoardFragment extends Fragment {
     }
 
     protected void reloadData() {
-        Board board = mViewModel.getBoard(tableId, boardId);
-        if (board == null) {
+        History history = mViewModel.getHistory(12301);
+        if (history == null) {
             return;
         }
-        List<Square> squares = board.getState();
+        score = history.getScore();
+        State matrix = history.getState();
+        List<Square> squares = matrix.getSquares();
         assert squares != null && squares.size() == 16 : "state error: " + squares;
         state.clear();
         state.addAll(Square.revert(squares));
@@ -76,6 +84,7 @@ public class BoardFragment extends Fragment {
     }
 
     protected void onReload() {
+        scoreView.setText("Score: " + score);
         adapter.notifyDataSetChanged();
     }
 }

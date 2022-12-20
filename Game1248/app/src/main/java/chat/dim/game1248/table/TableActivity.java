@@ -137,6 +137,9 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.board3, boardsFragment3)
                     .commitNow();
+
+            View trackPad = findViewById(R.id.trackpad);
+            trackPad.setOnTouchListener(this::onTouch);
         }
 
         gestureDetector = new GestureDetector(TableActivity.this, this);
@@ -203,6 +206,9 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
     }
 
     private boolean onTouch(View view, MotionEvent motionEvent) {
+        if (gestureDetector.onTouchEvent(motionEvent)) {
+            return true;
+        }
         if (AUTO_HIDE) {
             delayedHide(AUTO_HIDE_DELAY_MILLIS);
         }

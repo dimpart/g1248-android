@@ -7,7 +7,6 @@ import java.util.Map;
 
 import chat.dim.g1248.dbi.TableDBI;
 import chat.dim.g1248.model.Board;
-import chat.dim.g1248.model.History;
 import chat.dim.g1248.model.Score;
 import chat.dim.protocol.ID;
 
@@ -36,13 +35,31 @@ public class TableTable implements TableDBI {
 
     @Override
     public List<Board> getBoards(int tid) {
-        List<Board> boards = new ArrayList<>();
+        assert tid > 0 : "table ID error: " + tid;
 
         // TODO: load boards from local storage
+        return testBoards();
+    }
+
+    @Override
+    public Score getBestScore(int tid) {
+        return null;
+    }
+
+    // FIXME:
+    private static List<Board> testBoards() {
+        List<Board> boards = new ArrayList<>();
+
         final int boardCount = 4;
         List<Integer> state = new ArrayList<>();
+        int num;
         for (int i = 0; i < 16; ++i) {
-            state.add((int) Math.pow(2, i));
+            if (i < 6) {
+                num = (int) Math.pow(2, i);
+            } else {
+                num = 0;
+            }
+            state.add(num);
         }
 
         Map<String, Object> boardInfo;
@@ -58,15 +75,5 @@ public class TableTable implements TableDBI {
         }
 
         return boards;
-    }
-
-    @Override
-    public Score getBestScore(int tid) {
-        return null;
-    }
-
-    @Override
-    public List<History> getHistories(int tid) {
-        return new ArrayList<>();
     }
 }

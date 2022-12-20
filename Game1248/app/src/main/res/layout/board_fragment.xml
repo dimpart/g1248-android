@@ -20,5 +20,12 @@
         android:scrollbars="none"
         android:stretchMode="none"
         android:verticalSpacing="1dp"
-        tools:listitem="@layout/griditem_squares" />
+        tools:listitem="@layout/griditem_squares" >
+
+    </GridView>
+
+    <TextView
+        android:id="@+id/score_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </FrameLayout>
