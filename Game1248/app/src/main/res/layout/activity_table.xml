@@ -18,56 +18,103 @@
         android:id="@+id/fullscreen_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center_horizontal|top"
         android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
-            <include
-                android:id="@+id/board2"
-                layout="@layout/boards_fragment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <LinearLayout
+                android:id="@+id/layout2"
+                android:layout_width="260dp"
+                android:layout_height="260dp"
                 android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:scaleX="0.4"
+                android:scaleY="0.4"
+                android:transformPivotX="130dp"
+                android:transformPivotY="0dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <include
-                android:id="@+id/board1"
-                layout="@layout/boards_fragment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
+                <include
+                    android:id="@+id/board2"
+                    layout="@layout/board_fragment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout1"
+                android:layout_width="260dp"
+                android:layout_height="260dp"
                 android:layout_marginLeft="32dp"
-                android:layout_marginTop="8dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/board2" />
+                android:layout_marginTop="118dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:scaleX="0.5"
+                android:scaleY="0.5"
+                android:transformPivotX="0dp"
+                android:transformPivotY="0dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="32dp">
 
-            <include
-                android:id="@+id/board3"
-                layout="@layout/boards_fragment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="32dp"
+                <include
+                    android:id="@+id/board1"
+                    layout="@layout/board_fragment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout3"
+                android:layout_width="260dp"
+                android:layout_height="260dp"
+                android:layout_marginTop="118dp"
                 android:layout_marginRight="32dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/board2" />
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:scaleX="0.5"
+                android:scaleY="0.5"
+                android:transformPivotX="260dp"
+                android:transformPivotY="0dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginEnd="32dp">
 
-            <include
-                android:id="@+id/main_board"
-                layout="@layout/board_fragment"
+                <include
+                    android:id="@+id/board3"
+                    layout="@layout/board_fragment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/board1" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_marginTop="8dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout2">
 
+                <include
+                    android:id="@+id/main_board"
+                    layout="@layout/board_fragment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
     <LinearLayout

@@ -2,24 +2,327 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/card_view"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:padding="1dp"
-        app:cardBackgroundColor="#009688">
+        android:id="@+id/square0"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:padding="1dp">
 
         <TextView
-            android:id="@+id/text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|center_horizontal"
             android:layout_weight="1"
-            android:background="#DDDDDD"
             android:gravity="center|center_horizontal"
-            android:textSize="10sp" />
+            android:textSize="18sp" />
     </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:id="@+id/line1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square1"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#F7E5E4">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_1"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square2"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#F7CEC2">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_2"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square3"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#FAF2AC">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_4"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square4"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#D0F7D3">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_8"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/line2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square5"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#ABDDD8">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_16"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square6"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#03A9F4">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_32"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square7"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#A57AF6">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_64"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square8"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#5770FA">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_128"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/line3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square9"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#3BEBDB">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_256"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square10"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#41F748">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_512"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square11"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#F7E54C">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_1024"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square12"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#FF9800">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_2048"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/line4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square13"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#E91E63">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_4096"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square14"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#009688">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_8192"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square15"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#3F51B5">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_16384"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/square16"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:padding="1dp"
+            app:cardBackgroundColor="#000108">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_weight="1"
+                android:gravity="center|center_horizontal"
+                android:text="@string/num_32768"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
 </LinearLayout>

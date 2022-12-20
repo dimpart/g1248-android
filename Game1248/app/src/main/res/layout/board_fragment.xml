@@ -20,5 +20,5 @@
         android:scrollbars="none"
         android:stretchMode="none"
         android:verticalSpacing="1dp"
-        tools:listitem="@layout/griditem_square" />
+        tools:listitem="@layout/griditem_squares" />
 </FrameLayout>

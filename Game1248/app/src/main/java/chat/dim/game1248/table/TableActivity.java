@@ -5,13 +5,16 @@ import android.annotation.SuppressLint;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import chat.dim.format.JSON;
 import chat.dim.g1248.model.Step;
+import chat.dim.g1248.model.Table;
 import chat.dim.game1248.R;
 
 /**
@@ -101,19 +104,36 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 
         if (savedInstanceState == null) {
-            boardFragment = BoardFragment.newInstance();
+
+            int tid = 0, bid;
+            // get extra info
+            Intent intent = getIntent();
+            String json = intent.getStringExtra("table");
+            if (json == null) {
+                Table table = Table.parseTable(JSON.decode(json));
+                if (table != null) {
+                    tid = table.getTid();
+                }
+            }
+            bid = intent.getIntExtra("bid", -1);
+            if (bid < 0) {
+                // TODO: seek empty seat
+                bid = 0;
+            }
+
+            boardFragment = new MainBoardFragment(tid, bid % 4);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.main_board, boardFragment)
                     .commitNow();
-            boardsFragment1 = BoardsFragment.newInstance();
+            boardsFragment1 = new BoardFragment(tid, (bid + 1) % 4);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.board1, boardsFragment1)
                     .commitNow();
-            boardsFragment2 = BoardsFragment.newInstance();
+            boardsFragment2 = new BoardFragment(tid, (bid + 2) % 4);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.board2, boardsFragment2)
                     .commitNow();
-            boardsFragment3 = BoardsFragment.newInstance();
+            boardsFragment3 = new BoardFragment(tid, (bid + 3) % 4);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.board3, boardsFragment3)
                     .commitNow();
@@ -122,10 +142,10 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
         gestureDetector = new GestureDetector(TableActivity.this, this);
     }
 
-    private BoardFragment boardFragment = null;
-    private BoardsFragment boardsFragment1 = null;
-    private BoardsFragment boardsFragment2 = null;
-    private BoardsFragment boardsFragment3 = null;
+    private MainBoardFragment boardFragment = null;
+    private BoardFragment boardsFragment1 = null;
+    private BoardFragment boardsFragment2 = null;
+    private BoardFragment boardsFragment3 = null;
 
     GestureDetector gestureDetector = null;
 

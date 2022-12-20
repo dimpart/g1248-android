@@ -18,22 +18,25 @@ import java.util.List;
 
 import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.Square;
-import chat.dim.g1248.model.Step;
 import chat.dim.game1248.R;
 import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
 
 public class BoardFragment extends Fragment {
 
-    private TableViewModel mViewModel = null;
+    TableViewModel mViewModel = null;
     private BoardAdapter adapter = null;
 
     private GridView boardView = null;
 
-    private final List<Integer> state = new ArrayList<>();
+    int tableId;
+    int boardId;
+    final List<Integer> state = new ArrayList<>();
 
-    public static BoardFragment newInstance() {
-        return new BoardFragment();
+    public BoardFragment(int tid, int bid) {
+        super();
+        tableId = tid;
+        boardId = bid;
     }
 
     @Override
@@ -53,19 +56,17 @@ public class BoardFragment extends Fragment {
         // TODO: Use the ViewModel
 
         // create adapter
-        adapter = new BoardAdapter(getContext(), R.layout.griditem_square, state);
+        adapter = new BoardAdapter(getContext(), R.layout.griditem_squares, state);
         boardView.setAdapter(adapter);
         // load data in background
         BackgroundThreads.rush(this::reloadData);
     }
 
-    private void reloadData() {
-        // TODO: set table id after entered this activity
-        List<Board> boards = mViewModel.getBoards(0);
-        if (boards.size() == 0) {
+    protected void reloadData() {
+        Board board = mViewModel.getBoard(tableId, boardId);
+        if (board == null) {
             return;
         }
-        Board board = boards.get(0);
         List<Square> squares = board.getState();
         assert squares != null && squares.size() == 16 : "state error: " + squares;
         state.clear();
@@ -74,11 +75,7 @@ public class BoardFragment extends Fragment {
         MainThread.call(this::onReload);
     }
 
-    private void onReload() {
+    protected void onReload() {
         adapter.notifyDataSetChanged();
-    }
-
-    public void onSwipe(Step.Direction direction) {
-        System.out.println("swipe: " + direction);
     }
 }
