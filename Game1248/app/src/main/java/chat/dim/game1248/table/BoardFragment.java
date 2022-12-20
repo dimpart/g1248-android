@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chat.dim.g1248.model.Board;
+import chat.dim.g1248.model.Square;
+import chat.dim.g1248.model.Step;
 import chat.dim.game1248.R;
 import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
@@ -64,15 +66,19 @@ public class BoardFragment extends Fragment {
             return;
         }
         Board board = boards.get(0);
-        List<Integer> newState = board.getState();
-        assert newState != null && newState.size() == 16 : "state error: " + newState;
+        List<Square> squares = board.getState();
+        assert squares != null && squares.size() == 16 : "state error: " + squares;
         state.clear();
-        state.addAll(newState);
+        state.addAll(Square.revert(squares));
 
         MainThread.call(this::onReload);
     }
 
     private void onReload() {
         adapter.notifyDataSetChanged();
+    }
+
+    public void onSwipe(Step.Direction direction) {
+        System.out.println("swipe: " + direction);
     }
 }

@@ -7,6 +7,8 @@ import java.util.Map;
 
 import chat.dim.g1248.dbi.TableDBI;
 import chat.dim.g1248.model.Board;
+import chat.dim.g1248.model.History;
+import chat.dim.g1248.model.Score;
 import chat.dim.protocol.ID;
 
 /**
@@ -56,5 +58,15 @@ public class TableTable implements TableDBI {
         }
 
         return boards;
+    }
+
+    @Override
+    public Score getBestScore(int tid) {
+        return null;
+    }
+
+    @Override
+    public List<History> getHistories(int tid) {
+        return new ArrayList<>();
     }
 }

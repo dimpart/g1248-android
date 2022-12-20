@@ -7,16 +7,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import chat.dim.g1248.model.Step;
 import chat.dim.game1248.R;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class TableActivity extends AppCompatActivity {
+public class TableActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -116,12 +118,16 @@ public class TableActivity extends AppCompatActivity {
                     .replace(R.id.board3, boardsFragment3)
                     .commitNow();
         }
+
+        gestureDetector = new GestureDetector(TableActivity.this, this);
     }
 
     private BoardFragment boardFragment = null;
     private BoardsFragment boardsFragment1 = null;
     private BoardsFragment boardsFragment2 = null;
     private BoardsFragment boardsFragment3 = null;
+
+    GestureDetector gestureDetector = null;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -181,5 +187,66 @@ public class TableActivity extends AppCompatActivity {
             delayedHide(AUTO_HIDE_DELAY_MILLIS);
         }
         return false;
+    }
+
+    //
+    //  GestureDetector.OnGestureListener
+    //
+
+    @Override
+    public boolean onDown(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float distanceX, float distanceY) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float velocityX, float velocityY) {
+
+        Step.Direction direction;
+
+        float offsetX = motionEvent.getX() - motionEvent1.getX();
+        float offsetY = motionEvent.getY() - motionEvent1.getY();
+        if (Math.abs(offsetX) > Math.abs(offsetY)) {
+            if (offsetX > 0) {
+                direction = Step.Direction.LEFT;
+            } else {
+                direction = Step.Direction.RIGHT;
+            }
+        } else {
+            if (offsetY > 0) {
+                direction = Step.Direction.UP;
+            } else {
+                direction = Step.Direction.DOWN;
+            }
+        }
+
+        boardFragment.onSwipe(direction);
+
+        return true;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        //return super.onTouchEvent(event);
+        return gestureDetector.onTouchEvent(event);
     }
 }

@@ -7,8 +7,8 @@
 
     <GridView
         android:id="@+id/board_grid_view"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
+        android:layout_width="131dp"
+        android:layout_height="131dp"
         android:background="#CDDC39"
         android:choiceMode="none"
         android:clickable="false"
