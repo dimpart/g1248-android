@@ -12,10 +12,13 @@ import androidx.cardview.widget.CardView;
 
 import java.util.List;
 
-import chat.dim.format.JSON;
+import chat.dim.Register;
+import chat.dim.g1248.GlobalVariable;
 import chat.dim.g1248.model.Table;
 import chat.dim.game1248.R;
 import chat.dim.game1248.table.TableActivity;
+import chat.dim.mkm.User;
+import chat.dim.protocol.ID;
 
 public class TablesAdapter extends ArrayAdapter<Table> {
 
@@ -92,12 +95,22 @@ public class TablesAdapter extends ArrayAdapter<Table> {
         }
 
         private void clickTable() {
-            String json = JSON.encode(table.toMap());
+            // check local user
+            GlobalVariable shared = GlobalVariable.getInstance();
+            User user = shared.facebook.getCurrentUser();
+            if (user == null) {
+                Register register = new Register(shared.adb);
+                ID uid = register.createUser("Player ONE", null);
+                user = shared.facebook.getUser(uid);
+                shared.facebook.setCurrentUser(user);
+            }
+
+            int tid = table.getTid();
 
             Context content = getContext();
             Intent intent = new Intent();
             intent.setClass(content, TableActivity.class);
-            intent.putExtra("table", json);
+            intent.putExtra("tid", tid);
             content.startActivity(intent);
         }
     }

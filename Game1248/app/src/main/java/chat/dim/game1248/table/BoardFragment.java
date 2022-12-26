@@ -17,9 +17,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import chat.dim.g1248.model.History;
+import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.Square;
-import chat.dim.g1248.model.State;
 import chat.dim.game1248.R;
 import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
@@ -35,6 +34,7 @@ public class BoardFragment extends Fragment {
     int tableId;
     int boardId;
     int score;
+    byte[] steps;
     final List<Integer> state = new ArrayList<>();
 
     public BoardFragment(int tid, int bid) {
@@ -42,6 +42,7 @@ public class BoardFragment extends Fragment {
         tableId = tid;
         boardId = bid;
         score = 0;
+        steps = null;
     }
 
     @Override
@@ -68,23 +69,31 @@ public class BoardFragment extends Fragment {
         BackgroundThreads.rush(this::reloadData);
     }
 
-    protected void reloadData() {
-        History history = mViewModel.getHistory(12301);
-        if (history == null) {
+    void reloadData() {
+        Board board = mViewModel.getBoard(tableId, boardId);
+        if (board == null) {
+            // FIXME: db error
             return;
         }
-        score = history.getScore();
-        State matrix = history.getState();
-        List<Square> squares = matrix.getSquares();
-        assert squares != null && squares.size() == 16 : "state error: " + squares;
+        reloadBoard(board);
+    }
+    protected void reloadBoard(Board board) {
+        // get info from the board
+        List<Square> squares = board.getState();
         state.clear();
         state.addAll(Square.revert(squares));
+        score = board.getScore();
+        //steps = history.getSteps();
 
         MainThread.call(this::onReload);
     }
 
-    protected void onReload() {
-        scoreView.setText("Score: " + score);
+    void onReload() {
+        if (steps == null) {
+            scoreView.setText("Score: " + score);
+        } else {
+            scoreView.setText("Score: " + score + "    (steps: " + steps.length + ")");
+        }
         adapter.notifyDataSetChanged();
     }
 }

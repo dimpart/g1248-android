@@ -1,11 +1,14 @@
 package chat.dim.game1248.table;
 
-import java.util.Random;
-
+import chat.dim.g1248.GlobalVariable;
+import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.History;
 import chat.dim.g1248.model.State;
 import chat.dim.g1248.model.Step;
+import chat.dim.mkm.User;
+import chat.dim.protocol.ID;
 import chat.dim.threading.BackgroundThreads;
+import chat.dim.threading.MainThread;
 
 public class MainBoardFragment extends BoardFragment {
 
@@ -13,22 +16,68 @@ public class MainBoardFragment extends BoardFragment {
         super(tid, bid);
     }
 
-    public void onSwipe(Step.Direction direction) {
-        System.out.println("swipe: " + direction);
-        BackgroundThreads.rush(() -> doSwipe(tableId, boardId, direction));
-    }
+    @Override
+    protected void reloadBoard(Board board) {
+        ID player = board.getPlayer();
 
-    private void doSwipe(int tid, int bid, Step.Direction direction) {
-        // TODO: check current player
+        GlobalVariable shared = GlobalVariable.getInstance();
+        User user = shared.facebook.getCurrentUser();
+        if (user == null || (player != null && !user.getIdentifier().equals(player))) {
+            // when local user not set, or the board's current player not matched
+            // TODO: send 'watching' to the bot
 
-        History history = mViewModel.getHistory(12301);
-        if (history == null) {
+            super.reloadBoard(board);
             return;
         }
+        // when the board's current player is not set, or exactly be current user
+        // TODO: send 'playing' to the bot
+
+        // get history with gid in the board
+        int gid = board.getGid();
+        History history = mViewModel.getHistory(tableId, boardId, gid);
+        System.out.println("history: " + history);
+        // get info from history
+        State matrix = history.getState();
+        state.clear();
+        state.addAll(matrix.toArray());
+        score = history.getScore();
+        steps = history.getSteps();
+
+        MainThread.call(this::onReload);
+    }
+
+    void onSwipe(Step.Direction direction) {
+        System.out.println("swipe: " + direction);
+        BackgroundThreads.rush(() -> doSwipe(direction));
+    }
+
+    private void doSwipe(Step.Direction direction) {
+
+        // 1. check current user
+        GlobalVariable shared = GlobalVariable.getInstance();
+        User user = shared.facebook.getCurrentUser();
+        if (user == null) {
+            // TODO: current user not set yet
+            return;
+        }
+        ID current = user.getIdentifier();
+
+        // 2. get game history id from the board
+        int gid = 0;
+        Board board = mViewModel.getBoard(tableId, boardId);
+        if (board != null) {
+            ID player = board.getPlayer();
+            if (player != null && !player.equals(current)) {
+                // TODO: this seat is occupied
+                return;
+            }
+            gid = board.getGid();
+        }
+        History history = mViewModel.getHistory(tableId, boardId, gid);
         System.out.println("history: " + history);
 
         byte prefix = (byte) ((direction.value & 0x03) << 6);
-        byte suffix = (byte) (randomByte() & 0x3F);
+        byte suffix = (byte) (TableViewModel.randomByte() & 0x3F);
         Step next = new Step(prefix | suffix);
 
         State matrix = history.getState();
@@ -43,10 +92,5 @@ public class MainBoardFragment extends BoardFragment {
         history.setState(matrix);
 
         reloadData();
-    }
-
-    private static byte randomByte() {
-        Random random = new Random();
-        return (byte) random.nextInt();
     }
 }

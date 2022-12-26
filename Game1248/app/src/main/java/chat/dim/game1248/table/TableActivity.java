@@ -12,9 +12,11 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-import chat.dim.format.JSON;
+import java.util.List;
+
+import chat.dim.g1248.SharedDatabase;
+import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.Step;
-import chat.dim.g1248.model.Table;
 import chat.dim.game1248.R;
 
 /**
@@ -105,20 +107,23 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
 
         if (savedInstanceState == null) {
 
-            int tid = 0, bid;
             // get extra info
             Intent intent = getIntent();
-            String json = intent.getStringExtra("table");
-            if (json == null) {
-                Table table = Table.parseTable(JSON.decode(json));
-                if (table != null) {
-                    tid = table.getTid();
-                }
-            }
-            bid = intent.getIntExtra("bid", -1);
+            int tid = intent.getIntExtra("tid", 0);
+            int bid = intent.getIntExtra("bid", -1);
             if (bid < 0) {
-                // TODO: seek empty seat
+                // seek empty seat
                 bid = 0;
+                SharedDatabase db = SharedDatabase.getInstance();
+                List<Board> boards = db.getBoards(tid);
+                if (boards != null) {
+                    for (Board item : boards) {
+                        if (item.getPlayer() == null) {
+                            bid = item.getBid();
+                            break;
+                        }
+                    }
+                }
             }
 
             boardFragment = new MainBoardFragment(tid, bid % 4);

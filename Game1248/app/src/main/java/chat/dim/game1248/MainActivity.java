@@ -23,6 +23,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 
 import java.io.File;
+import java.io.IOException;
 
 import chat.dim.filesys.ExternalStorage;
 import chat.dim.format.Base64;
@@ -69,6 +70,12 @@ public class MainActivity extends AppCompatActivity
                     .commitNow();
         }
 
+
+        try {
+            Client.prepare(getResources().getAssets());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -143,7 +150,7 @@ public class MainActivity extends AppCompatActivity
         };
 
         String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        path += File.separator + "chat.dim.g1248";
+        path += File.separator + "chat.dim.game1248";
         ExternalStorage.setRoot(path);
     }
 }
