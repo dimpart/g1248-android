@@ -95,16 +95,6 @@ public class TablesAdapter extends ArrayAdapter<Table> {
         }
 
         private void clickTable() {
-            // check local user
-            GlobalVariable shared = GlobalVariable.getInstance();
-            User user = shared.facebook.getCurrentUser();
-            if (user == null) {
-                Register register = new Register(shared.adb);
-                ID uid = register.createUser("Player ONE", null);
-                user = shared.facebook.getUser(uid);
-                shared.facebook.setCurrentUser(user);
-            }
-
             int tid = table.getTid();
 
             Context content = getContext();

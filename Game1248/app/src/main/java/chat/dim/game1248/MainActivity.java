@@ -1,5 +1,6 @@
 package chat.dim.game1248;
 
+import android.content.res.AssetManager;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -22,14 +23,25 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
+import chat.dim.CommonFacebook;
+import chat.dim.Config;
+import chat.dim.Register;
 import chat.dim.filesys.ExternalStorage;
 import chat.dim.format.Base64;
 import chat.dim.format.DataCoder;
+import chat.dim.g1248.GlobalVariable;
 import chat.dim.game1248.hall.TablesFragment;
+import chat.dim.io.Permissions;
+import chat.dim.mkm.User;
+import chat.dim.protocol.ID;
+import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
+import chat.dim.type.Triplet;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -72,10 +84,58 @@ public class MainActivity extends AppCompatActivity
 
 
         try {
-            Client.prepare(getResources().getAssets());
+            // load config file
+            AssetManager am = getResources().getAssets();
+            InputStreamReader isr = new InputStreamReader(am.open("config.ini"));
+            BufferedReader br = new BufferedReader(isr);
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            }
+            Client.prepare(sb.toString(), this);
+            // launch client
+            launch();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void launch() {
+        if (!Permissions.canWriteExternalStorage(this)) {
+            Permissions.requestExternalStoragePermissions(this);
+            System.out.println("[WARNING] Requesting external storage permissions");
+            return;
+        }
+        BackgroundThreads.rush(() -> {
+            GlobalVariable shared = GlobalVariable.getInstance();
+            CommonFacebook facebook = shared.facebook;
+            Config config = shared.config;
+            Client client = (Client) shared.terminal;
+            // check local user
+            User user = facebook.getCurrentUser();
+            if (user == null) {
+                Register register = new Register(shared.adb);
+                ID uid = register.createUser("Player ONE", null);
+                user = facebook.getUser(uid);
+                facebook.setCurrentUser(user);
+
+            }
+            // get the nearest neighbor station
+            String host;
+            int port;
+            Triplet<String, Integer, ID> neighbor = client.getNeighborStation();
+            if (neighbor != null) {
+                host = neighbor.first;
+                port = neighbor.second;
+            } else {
+                host = config.getStationHost();
+                port = config.getStationPort();
+            }
+            // connect to the station
+            client.connect(host, port);
+        });
     }
 
     @Override

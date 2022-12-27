@@ -1,11 +1,8 @@
 package chat.dim.game1248;
 
-import android.content.res.AssetManager;
+import android.content.Context;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.Set;
 
 import chat.dim.ClientMessenger;
 import chat.dim.CommonFacebook;
@@ -31,7 +28,11 @@ import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.handler.HallHandler;
 import chat.dim.g1248.handler.TableHandler;
 import chat.dim.network.ClientSession;
+import chat.dim.protocol.ID;
 import chat.dim.sqlite.DatabaseConnector;
+import chat.dim.sqlite.account.AccountDatabase;
+import chat.dim.sqlite.message.MessageDatabase;
+import chat.dim.type.Triplet;
 
 public class Client extends Terminal {
 
@@ -90,22 +91,23 @@ public class Client extends Terminal {
         return new CompatibleMessenger(session, facebook, mdb);
     }
 
-    private static SharedDatabase createDatabase(Config config) {
+    private static SharedDatabase createDatabase(Config config, Context context) {
         String rootDir = config.getDatabaseRoot();
         String pubDir = config.getDatabasePublic();
         String priDir = config.getDatabasePrivate();
 
+        // FIXME: Environment.getExternalStorageDirectory().getAbsolutePath();
         ExternalStorage.setRoot(rootDir);
 
-        String adbPath = config.getString("sqlite", "account");
-        String mdbPath = config.getString("sqlite", "message");
-        //String sdbPath = config.getString("sqlite", "session");
-        //String gdbPath = config.getString("sqlite", "game");
+        String adbFile = config.getString("sqlite", "account");
+        String mdbFile = config.getString("sqlite", "message");
+        //String sdbFile = config.getString("sqlite", "session");
+        //String gdbFile = config.getString("sqlite", "game");
 
-        DatabaseConnector adb = new DatabaseConnector(adbPath);
-        DatabaseConnector mdb = new DatabaseConnector(mdbPath);
-        //DatabaseConnector sdb = new DatabaseConnector(sdbPath);
-        //DatabaseConnector gdb = new DatabaseConnector(gdbPath);
+        DatabaseConnector adb = new AccountDatabase(context, adbFile);
+        DatabaseConnector mdb = new MessageDatabase(context, mdbFile);
+        //DatabaseConnector sdb = new SessionDatabase(context, sdbFile);
+        //DatabaseConnector gdb = new GameDatabase(context, gdbFile);
 
         SharedDatabase db = SharedDatabase.getInstance();
         db.privateKeyDatabase = new PrivateKeyDatabase(rootDir, pubDir, priDir, adb);
@@ -120,39 +122,47 @@ public class Client extends Terminal {
         db.historyDatabase = new HistoryCache();
         return db;
     }
-    private static String getAssets(AssetManager am, String filename) throws IOException {
-        InputStream is = am.open(filename);
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
-            sb.append("\n");
+
+    Triplet<String, Integer, ID> getNeighborStation() {
+        Set<Triplet<String, Integer, ID>> neighbors = getDatabase().allNeighbors();
+        if (neighbors != null) {
+            for (Triplet<String, Integer, ID> station : neighbors) {
+                if (station.first != null && station.second > 0) {
+                    return station;
+                }
+            }
         }
-        return sb.toString();
+        return null;
     }
 
-    public static void prepare(AssetManager am) throws IOException {
+    static void prepare(String iniFileContent, Context context) {
         GlobalVariable shared = GlobalVariable.getInstance();
-        if (shared.config != null) {
+        if (shared.terminal != null) {
             // already loaded
             return;
         }
         // Step 1: load config
-        String ini = getAssets(am, "config.ini");
-        Config config = Config.load(ini);
+        Config config = Config.load(iniFileContent);
+        shared.config = config;
 
         // Step 2: create database
-        SharedDatabase db = createDatabase(config);
+        SharedDatabase db = createDatabase(config, context);
         shared.adb = db;
         shared.mdb = db;
         shared.sdb = db;
 
         // Step 3: create facebook
-        shared.facebook = new CommonFacebook(db);
+        CommonFacebook facebook = new CommonFacebook(db);
+        shared.facebook = facebook;
 
-        // Step 4: create customized content handlers
+        // Step 4: create terminal
+        Client client = new Client(facebook, db);
+        Thread thread = new Thread(client);
+        thread.setDaemon(false);
+        thread.start();
+        shared.terminal = client;
+
+        // Step 5: create customized content handlers
         shared.gameHallContentHandler = new HallHandler(db);
         shared.gameTableContentHandler = new TableHandler(db);
     }
