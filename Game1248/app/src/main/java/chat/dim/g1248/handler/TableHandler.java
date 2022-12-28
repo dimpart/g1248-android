@@ -1,11 +1,16 @@
 package chat.dim.g1248.handler;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import chat.dim.cache.game.HistoryCache;
+import chat.dim.g1248.GlobalVariable;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
-import chat.dim.g1248.model.History;
+import chat.dim.game1248.Client;
+import chat.dim.game1248.NotificationNames;
+import chat.dim.notification.NotificationCenter;
 import chat.dim.protocol.Content;
 import chat.dim.protocol.CustomizedContent;
 import chat.dim.protocol.ID;
@@ -40,19 +45,31 @@ public class TableHandler extends GameTableContentHandler {
         } else {
             tid = ((Number) integer).intValue();
         }
+
+        GlobalVariable shared = GlobalVariable.getInstance();
+        Client client = (Client) shared.terminal;
+
         Object array = content.get("boards");
         if (array instanceof List) {
             List<Board> boards = Board.convert((List<Object>) array);
             for (Board item : boards) {
+                if (tid == client.tid && item.getBid() == client.bid) {
+                    // FIXME:
+                    Log.debug("this board is playing");
+                    continue;
+                }
+
                 database.updateBoard(tid, item);
+
+                Map<String, Object> info = new HashMap<>();
+                info.put("tid", tid);
+                info.put("bid", item.getBid());
+                info.put("board", item);
+                NotificationCenter nc = NotificationCenter.getInstance();
+                nc.postNotification(NotificationNames.GameBoardUpdated, this, info);
             }
         }
-        // fetch history
-        Object dict = content.get("history");
-        History history = History.parseHistory(dict);
-        if (history != null) {
-            database.saveHistory(history);
-        }
+
         return null;
     }
 

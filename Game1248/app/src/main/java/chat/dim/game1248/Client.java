@@ -2,6 +2,7 @@ package chat.dim.game1248;
 
 import android.content.Context;
 
+import java.util.Map;
 import java.util.Set;
 
 import chat.dim.ClientMessenger;
@@ -27,10 +28,14 @@ import chat.dim.g1248.GlobalVariable;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.handler.HallHandler;
 import chat.dim.g1248.handler.TableHandler;
+import chat.dim.g1248.model.History;
 import chat.dim.g1248.protocol.GameCustomizedContent;
 import chat.dim.g1248.protocol.GameHallContent;
 import chat.dim.g1248.protocol.GameTableContent;
 import chat.dim.network.ClientSession;
+import chat.dim.notification.Notification;
+import chat.dim.notification.NotificationCenter;
+import chat.dim.notification.Observer;
 import chat.dim.protocol.ID;
 import chat.dim.sqlite.DatabaseConnector;
 import chat.dim.sqlite.account.AccountDatabase;
@@ -38,33 +43,59 @@ import chat.dim.sqlite.message.MessageDatabase;
 import chat.dim.type.Triplet;
 import chat.dim.utils.Log;
 
-public class Client extends Terminal {
+public class Client extends Terminal implements Observer {
 
     public int tid = -1;
     public int bid = -1;
 
-    public Client(CommonFacebook barrack, SessionDBI sdb) {
+    private final ID gameBot;
+
+    public Client(CommonFacebook barrack, SessionDBI sdb, ID bot) {
         super(barrack, sdb);
+
+        gameBot = bot;
+
+        NotificationCenter nc = NotificationCenter.getInstance();
+        nc.addObserver(this, NotificationNames.PlayNextMove);
+    }
+
+    @Override
+    public void onReceiveNotification(Notification notification) {
+        String name = notification.name;
+        Map info = notification.userInfo;
+        assert name != null && info != null : "notification error: " + notification;
+        if (!name.equals(NotificationNames.PlayNextMove)) {
+            // should not happen
+            return;
+        }
+        History history = (History) info.get("history");
+        assert history != null : "history not found";
+
+        GameTableContent request = GameTableContent.play(history);
+
+//        Log.info("[GAME] sending request: " + gameBot + ", " + request);
+//        ClientMessenger messenger = getMessenger();
+//        messenger.sendContent(null, gameBot, request, 0);
+    }
+
+    @Override
+    protected boolean isExpired(long last, long now) {
+        // keep online every minute
+        return now < (last + 60 * 1000);
     }
 
     @Override
     protected void keepOnline(ID uid, ClientMessenger messenger) {
         super.keepOnline(uid, messenger);
-        GlobalVariable shared = GlobalVariable.getInstance();
-        Config config = shared.config;
-        ID bot = config.getANS("g1248");
-        if (bot == null) {
-            Log.error("bot ID not found");
-            return;
-        }
+
         GameCustomizedContent request;
         if (tid == -1 || bid == -1) {
             request = GameHallContent.seek(0, 20);
         } else {
             request = GameTableContent.watch(tid, bid);
         }
-        Log.info("[GAME] sending request: " + bot + ", " + request);
-        messenger.sendContent(null, bot, request, 0);
+        Log.info("[GAME] sending request: " + gameBot + ", " + request);
+        messenger.sendContent(null, gameBot, request, 0);
     }
 
     @Override
@@ -151,7 +182,7 @@ public class Client extends Terminal {
     }
 
     Triplet<String, Integer, ID> getNeighborStation() {
-        Set<Triplet<String, Integer, ID>> neighbors = getDatabase().allNeighbors();
+        Set<Triplet<String, Integer, ID>> neighbors = database.allNeighbors();
         if (neighbors != null) {
             for (Triplet<String, Integer, ID> station : neighbors) {
                 if (station.first != null && station.second > 0) {
@@ -171,6 +202,8 @@ public class Client extends Terminal {
         // Step 1: load config
         Config config = Config.load(iniFileContent);
         shared.config = config;
+        ID bot = config.getANS("g1248");
+        assert bot != null : "bot id not set";
 
         // Step 2: create database
         SharedDatabase db = createDatabase(config, context);
@@ -183,7 +216,7 @@ public class Client extends Terminal {
         shared.facebook = facebook;
 
         // Step 4: create terminal
-        Client client = new Client(facebook, db);
+        Client client = new Client(facebook, db, bot);
         Thread thread = new Thread(client);
         thread.setDaemon(false);
         thread.start();

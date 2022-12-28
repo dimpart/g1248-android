@@ -18,28 +18,26 @@ public class TableViewModel extends ViewModel {
         SharedDatabase database = SharedDatabase.getInstance();
 
         List<Board> boards = database.getBoards(tid);
-        if (boards == null) {
-            return null;
-        }
+        if (boards != null) {
+            // 1. get by 'bid'
+            for (Board item : boards) {
+                if (item.getBid() == bid) {
+                    return item;
+                }
+            }
 
-        // 1. get by 'bid'
-        for (Board item : boards) {
-            if (item.getBid() == bid) {
-                return item;
+            // 2. get by index
+            if (0 <= bid && bid < boards.size()) {
+                Board candidate = boards.get(bid);
+                // if 'bid' not in the board info, then take it.
+                if (!candidate.containsKey("bid")) {
+                    return candidate;
+                }
             }
         }
 
-        // 2. get by index
-        if (bid < 0 || bid >= boards.size()) {
-            return null;
-        }
-        Board candidate = boards.get(bid);
-        // if 'bid' not in the board info, then take it.
-        if (candidate.containsKey("bid")) {
-            return null;
-        } else {
-            return candidate;
-        }
+        // new board
+        return new Board(bid, 4);
     }
 
     public void saveHistory(History history) {

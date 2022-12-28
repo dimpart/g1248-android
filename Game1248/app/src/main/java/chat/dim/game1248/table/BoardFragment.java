@@ -16,14 +16,21 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.Square;
+import chat.dim.game1248.NotificationNames;
 import chat.dim.game1248.R;
+import chat.dim.notification.Notification;
+import chat.dim.notification.NotificationCenter;
+import chat.dim.notification.Observer;
+import chat.dim.protocol.ID;
 import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
+import chat.dim.utils.Log;
 
-public class BoardFragment extends Fragment {
+public class BoardFragment extends Fragment implements Observer {
 
     TableViewModel mViewModel = null;
     private BoardAdapter adapter = null;
@@ -66,17 +73,13 @@ public class BoardFragment extends Fragment {
         adapter = new BoardAdapter(getContext(), R.layout.griditem_squares, state);
         boardView.setAdapter(adapter);
         // load data in background
-        BackgroundThreads.rush(this::reloadData);
+        BackgroundThreads.rush(() -> {
+            Board board = mViewModel.getBoard(tableId, boardId);
+            assert board != null : "failed to get board: tid=" + tableId + ", bid=" + boardId;
+            reloadBoard(board);
+        });
     }
 
-    void reloadData() {
-        Board board = mViewModel.getBoard(tableId, boardId);
-        if (board == null) {
-            // FIXME: db error
-            return;
-        }
-        reloadBoard(board);
-    }
     protected void reloadBoard(Board board) {
         // get info from the board
         List<Square> squares = board.getState();
@@ -95,5 +98,47 @@ public class BoardFragment extends Fragment {
             scoreView.setText("Score: " + score + "    (steps: " + steps.length + ")");
         }
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        NotificationCenter nc = NotificationCenter.getInstance();
+        nc.addObserver(this, NotificationNames.GameBoardUpdated);
+    }
+
+    @Override
+    public void onDestroy() {
+        NotificationCenter nc = NotificationCenter.getInstance();
+        nc.removeObserver(this, NotificationNames.GameBoardUpdated);
+        super.onDestroy();
+    }
+
+    @Override
+    public void onReceiveNotification(Notification notification) {
+        String name = notification.name;
+        Map info = notification.userInfo;
+        assert name != null && info != null : "notification error: " + notification;
+        if (!name.equals(NotificationNames.GameBoardUpdated)) {
+            // should not happen
+            return;
+        }
+        int tid = (int) info.get("tid");
+        int bid = (int) info.get("bid");
+        if (tid != tableId || bid != tableId) {
+            // not mine
+            return;
+        }
+        Board board = (Board) info.get("board");
+        assert board != null && board.getBid() == bid : "bid error: " + bid + ", " + board;
+        ID player = board.getPlayer();
+        if (player == null) {
+            // received data error?
+            Log.error("error board: " + board);
+            return;
+        }
+
+        Log.info("[GAME] refreshing tid: " + tid + ", bid: " + bid);
+        reloadBoard(board);
     }
 }

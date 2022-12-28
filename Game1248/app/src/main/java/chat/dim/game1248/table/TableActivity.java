@@ -20,6 +20,7 @@ import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.Step;
 import chat.dim.game1248.Client;
 import chat.dim.game1248.R;
+import chat.dim.utils.Log;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -127,6 +128,7 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
                     }
                 }
             }
+            Log.info("[GAME] enter tid: " + tid + ", bid: " + bid);
 
             boardFragment = new MainBoardFragment(tid, bid % 4);
             getSupportFragmentManager().beginTransaction()

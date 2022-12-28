@@ -13,13 +13,18 @@ import androidx.lifecycle.ViewModelProviders;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import chat.dim.g1248.model.Table;
+import chat.dim.game1248.NotificationNames;
 import chat.dim.game1248.R;
+import chat.dim.notification.Notification;
+import chat.dim.notification.NotificationCenter;
+import chat.dim.notification.Observer;
 import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
 
-public class TablesFragment extends Fragment {
+public class TablesFragment extends Fragment implements Observer {
 
     private HallViewModel mViewModel = null;
     private TablesAdapter adapter = null;
@@ -55,10 +60,10 @@ public class TablesFragment extends Fragment {
         adapter = new TablesAdapter(getContext(), R.layout.griditem_tables, tables);
         tablesView.setAdapter(adapter);
         // load data in background
-        BackgroundThreads.wait(this::reloadData);
+        BackgroundThreads.wait(this::reloadTables);
     }
 
-    private void reloadData() {
+    public void reloadTables() {
         List<Table> newTables = mViewModel.getTables(0, 20);
         tables.clear();
         tables.addAll(newTables);
@@ -67,5 +72,31 @@ public class TablesFragment extends Fragment {
     }
     private void onReload() {
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        NotificationCenter nc = NotificationCenter.getInstance();
+        nc.addObserver(this, NotificationNames.TablesUpdated);
+    }
+
+    @Override
+    public void onDestroy() {
+        NotificationCenter nc = NotificationCenter.getInstance();
+        nc.removeObserver(this, NotificationNames.TablesUpdated);
+        super.onDestroy();
+    }
+
+    @Override
+    public void onReceiveNotification(Notification notification) {
+        String name = notification.name;
+        Map info = notification.userInfo;
+        assert name != null && info != null : "notification error: " + notification;
+        if (!name.equals(NotificationNames.TablesUpdated)) {
+            // should not happen
+            return;
+        }
+        reloadTables();
     }
 }

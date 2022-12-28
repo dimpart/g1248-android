@@ -35,6 +35,7 @@ public class HistoryCache implements HistoryDBI {
         }
         historyCache.remove(0);
         history.setGid(gid);
+        history.setPlayer(player);
         historyCache.put(gid, history);
         return true;
     }

@@ -1,11 +1,8 @@
 package chat.dim.cache.game;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import chat.dim.format.JSON;
 import chat.dim.g1248.dbi.HallDBI;
 import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.Score;
@@ -21,6 +18,7 @@ public class HallCache implements HallDBI {
         List<Table> tables = new ArrayList<>();
         int total = cachedTables.size();
         if (total == 0) {
+            // place an empty table
             Table placeholder = new Table();
             tables.add(placeholder);
         } else {
@@ -39,14 +37,14 @@ public class HallCache implements HallDBI {
     @Override
     public boolean updateTable(int tid, List<Board> boards, Score best) {
         // create table
-        String array = boards == null ? "[]" : JSON.encode(boards);
-        String dict = best == null ? "{}" : JSON.encode(best);
-
-        Map<String, Object> info = new HashMap<>();
-        info.put("tid", tid);
-        info.put("boards", array);
-        info.put("best", dict);
-        Table table = new Table(info);
+        Table table = new Table();
+        table.setTid(tid);
+        if (boards != null) {
+            table.setBoards(boards);
+        }
+        if (best != null) {
+            table.setBest(best);
+        }
 
         // update cache
         int total = cachedTables.size();
@@ -60,6 +58,7 @@ public class HallCache implements HallDBI {
                 // old record exists, remove it
                 cachedTables.remove(index);
             }
+            // OK, place the new table here
             break;
         }
         cachedTables.add(index, table);
