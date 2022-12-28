@@ -9,6 +9,7 @@ import chat.dim.mkm.User;
 import chat.dim.protocol.ID;
 import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
+import chat.dim.utils.Log;
 
 public class MainBoardFragment extends BoardFragment {
 
@@ -35,7 +36,7 @@ public class MainBoardFragment extends BoardFragment {
         // get history with gid in the board
         int gid = board.getGid();
         History history = mViewModel.getHistory(tableId, boardId, gid);
-        System.out.println("history: " + history);
+        Log.debug("history: " + history);
         // get info from history
         State matrix = history.getState();
         state.clear();
@@ -47,7 +48,7 @@ public class MainBoardFragment extends BoardFragment {
     }
 
     void onSwipe(Step.Direction direction) {
-        System.out.println("swipe: " + direction);
+        Log.debug("swipe: " + direction);
         BackgroundThreads.rush(() -> doSwipe(direction));
     }
 
@@ -74,7 +75,7 @@ public class MainBoardFragment extends BoardFragment {
             gid = board.getGid();
         }
         History history = mViewModel.getHistory(tableId, boardId, gid);
-        System.out.println("history: " + history);
+        Log.debug("history: " + history);
 
         byte prefix = (byte) ((direction.value & 0x03) << 6);
         byte suffix = (byte) (TableViewModel.randomByte() & 0x3F);

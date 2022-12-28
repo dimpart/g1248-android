@@ -10,6 +10,7 @@ import chat.dim.protocol.Content;
 import chat.dim.protocol.CustomizedContent;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.ReliableMessage;
+import chat.dim.utils.Log;
 
 public class TableHandler extends GameTableContentHandler {
 
@@ -29,6 +30,7 @@ public class TableHandler extends GameTableContentHandler {
     @SuppressWarnings("unchecked")
     @Override
     protected List<Content> handleWatchResponse(ID sender, CustomizedContent content, ReliableMessage rMsg) {
+        Log.info("[GAME] received watch response: " + sender + ", " + content);
         // S -> C: "boards"
         int tid;
         Object integer;
@@ -62,6 +64,7 @@ public class TableHandler extends GameTableContentHandler {
 
     @Override
     protected List<Content> handlePlayResponse(ID sender, CustomizedContent content, ReliableMessage rMsg) {
+        Log.info("[GAME] received play response: " + sender + ", " + content);
         // S -> C: "played"
         int tid = (int) content.get("tid");
         int bid = (int) content.get("bid");

@@ -27,6 +27,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import chat.dim.CommonFacebook;
 import chat.dim.Config;
@@ -42,6 +44,7 @@ import chat.dim.protocol.ID;
 import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
 import chat.dim.type.Triplet;
+import chat.dim.utils.Log;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity
     private void launch() {
         if (!Permissions.canWriteExternalStorage(this)) {
             Permissions.requestExternalStoragePermissions(this);
-            System.out.println("[WARNING] Requesting external storage permissions");
+            Log.warning("Requesting external storage permissions");
             return;
         }
         BackgroundThreads.rush(() -> {
@@ -120,7 +123,9 @@ public class MainActivity extends AppCompatActivity
                 ID uid = register.createUser("Player ONE", null);
                 user = facebook.getUser(uid);
                 facebook.setCurrentUser(user);
-
+                List<ID> localUsers = new ArrayList<>();
+                localUsers.add(uid);
+                shared.adb.saveLocalUsers(localUsers);
             }
             // get the nearest neighbor station
             String host;
@@ -134,6 +139,7 @@ public class MainActivity extends AppCompatActivity
                 port = config.getStationPort();
             }
             // connect to the station
+            Log.info("[GAME] user " + user + " login (" + host + ":" + port + ") ...");
             client.connect(host, port);
         });
     }
@@ -196,6 +202,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     static {
+
+        Log.LEVEL = Log.DEVELOP;
+
+        // prepare plugins
+        GlobalVariable shared = GlobalVariable.getInstance();
+        assert shared != null;
+
         // android.Base64
         Base64.coder = new DataCoder() {
             @Override

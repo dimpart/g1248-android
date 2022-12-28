@@ -8,6 +8,7 @@ import chat.dim.protocol.Content;
 import chat.dim.protocol.CustomizedContent;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.ReliableMessage;
+import chat.dim.utils.Log;
 
 public class HallHandler extends GameHallContentHandler {
 
@@ -27,6 +28,7 @@ public class HallHandler extends GameHallContentHandler {
     @SuppressWarnings("unchecked")
     @Override
     protected List<Content> handleSeekResponse(ID sender, CustomizedContent content, ReliableMessage rMsg) {
+        Log.info("[GAME] received seek response: " + sender + ", " + content);
         // S -> C: "tables"
         Object array = content.get("tables");
         if (array instanceof List) {

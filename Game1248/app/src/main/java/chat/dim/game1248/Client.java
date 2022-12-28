@@ -27,17 +27,44 @@ import chat.dim.g1248.GlobalVariable;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.handler.HallHandler;
 import chat.dim.g1248.handler.TableHandler;
+import chat.dim.g1248.protocol.GameCustomizedContent;
+import chat.dim.g1248.protocol.GameHallContent;
+import chat.dim.g1248.protocol.GameTableContent;
 import chat.dim.network.ClientSession;
 import chat.dim.protocol.ID;
 import chat.dim.sqlite.DatabaseConnector;
 import chat.dim.sqlite.account.AccountDatabase;
 import chat.dim.sqlite.message.MessageDatabase;
 import chat.dim.type.Triplet;
+import chat.dim.utils.Log;
 
 public class Client extends Terminal {
 
+    public int tid = -1;
+    public int bid = -1;
+
     public Client(CommonFacebook barrack, SessionDBI sdb) {
         super(barrack, sdb);
+    }
+
+    @Override
+    protected void keepOnline(ID uid, ClientMessenger messenger) {
+        super.keepOnline(uid, messenger);
+        GlobalVariable shared = GlobalVariable.getInstance();
+        Config config = shared.config;
+        ID bot = config.getANS("g1248");
+        if (bot == null) {
+            Log.error("bot ID not found");
+            return;
+        }
+        GameCustomizedContent request;
+        if (tid == -1 || bid == -1) {
+            request = GameHallContent.seek(0, 20);
+        } else {
+            request = GameTableContent.watch(tid, bid);
+        }
+        Log.info("[GAME] sending request: " + bot + ", " + request);
+        messenger.sendContent(null, bot, request, 0);
     }
 
     @Override

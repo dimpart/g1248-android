@@ -14,9 +14,11 @@ import android.view.View;
 
 import java.util.List;
 
+import chat.dim.g1248.GlobalVariable;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.Step;
+import chat.dim.game1248.Client;
 import chat.dim.game1248.R;
 
 /**
@@ -145,10 +147,31 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
 
             View trackPad = findViewById(R.id.trackpad);
             trackPad.setOnTouchListener(this::onTouch);
+
+            GlobalVariable shared = GlobalVariable.getInstance();
+            Client client = (Client) shared.terminal;
+            if (client != null) {
+                client.tid = tid;
+                client.bid = bid;
+            }
         }
 
         gestureDetector = new GestureDetector(TableActivity.this, this);
     }
+
+    @Override
+    protected void onDestroy() {
+
+        GlobalVariable shared = GlobalVariable.getInstance();
+        Client client = (Client) shared.terminal;
+        if (client != null) {
+            client.tid = -1;
+            client.bid = -1;
+        }
+
+        super.onDestroy();
+    }
+
 
     private MainBoardFragment boardFragment = null;
     private BoardFragment boardsFragment1 = null;
