@@ -82,7 +82,7 @@ public class BoardFragment extends Fragment implements Observer {
 
     protected void reloadBoard(Board board) {
         // get info from the board
-        List<Square> squares = board.getState();
+        List<Square> squares = board.getSquares();
         state.clear();
         state.addAll(Square.revert(squares));
         score = board.getScore();

@@ -14,7 +14,6 @@ import android.view.View;
 
 import java.util.List;
 
-import chat.dim.cache.game.HallCache;
 import chat.dim.cache.game.TableCache;
 import chat.dim.g1248.PlayerOne;
 import chat.dim.g1248.SharedDatabase;
@@ -132,19 +131,19 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
             }
             Log.info("[GAME] enter tid: " + tid + ", bid: " + bid);
 
-            boardFragment = new MainBoardFragment(tid, bid % 4);
+            boardFragment = new MainBoardFragment(tid, bid % TableCache.MAX_BOARDS_COUNT);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.main_board, boardFragment)
                     .commitNow();
-            boardsFragment1 = new BoardFragment(tid, (bid + 1) % 4);
+            boardsFragment1 = new BoardFragment(tid, (bid + 1) % TableCache.MAX_BOARDS_COUNT);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.board1, boardsFragment1)
                     .commitNow();
-            boardsFragment2 = new BoardFragment(tid, (bid + 2) % 4);
+            boardsFragment2 = new BoardFragment(tid, (bid + 2) % TableCache.MAX_BOARDS_COUNT);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.board2, boardsFragment2)
                     .commitNow();
-            boardsFragment3 = new BoardFragment(tid, (bid + 3) % 4);
+            boardsFragment3 = new BoardFragment(tid, (bid + 3) % TableCache.MAX_BOARDS_COUNT);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.board3, boardsFragment3)
                     .commitNow();
@@ -152,11 +151,9 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
             View trackPad = findViewById(R.id.trackpad);
             trackPad.setOnTouchListener(this::onTouch);
 
-            HallCache hallCache = (HallCache) db.hallDatabase;
-            TableCache tableCache = (TableCache) db.tableDatabase;
             PlayerOne theOne = PlayerOne.getInstance();
-            theOne.table = hallCache.getTable(tid);
-            theOne.board = tableCache.getBoard(tid, bid);
+            theOne.table = db.getTable(tid);
+            theOne.board = db.getBoard(tid, bid);
         }
 
         gestureDetector = new GestureDetector(TableActivity.this, this);

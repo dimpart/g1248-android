@@ -102,15 +102,20 @@ public class TableHandler extends GameTableContentHandler {
         Board board = theOne.board;
         if (table == null || board == null) {
             Log.error("not playing now");
-        } else if (table.getTid() == tid && board.getBid() == bid/* && theOne.equals(player)*/) {
-            // update gid, if player changed, means this seat is token away by another player
+        } else if (table.getTid() != tid || board.getBid() != bid) {
+            Log.error("play response error: " + content);
+        } else if (theOne.equals(player)) {
+            // update gid
             board.setGid(gid);
             board.setPlayer(player);
-            TableCache tdb = (TableCache) database.tableDatabase;
-            tdb.updateBoard(tid, board);
+            database.updateBoard(tid, board);
             HistoryCache hdb = (HistoryCache) database.historyDatabase;
             hdb.updatePlayingHistory(tid, bid, gid, player);
+        } else {
+            // if player changed, means this seat is token away by another player
+            board.setPlayer(player);
         }
+
         return null;
     }
 }

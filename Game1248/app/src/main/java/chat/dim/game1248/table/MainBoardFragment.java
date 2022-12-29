@@ -53,7 +53,7 @@ public class MainBoardFragment extends BoardFragment {
         Log.debug("history: " + history);
 
         // 3. refresh info from history
-        State matrix = history.getState();
+        State matrix = history.getMatrix();
         state.clear();
         state.addAll(matrix.toArray());
         score = history.getScore();
@@ -95,7 +95,7 @@ public class MainBoardFragment extends BoardFragment {
         byte suffix = (byte) (TableViewModel.randomByte() & 0x3F);
         Step next = new Step(prefix | suffix);
 
-        State matrix = history.getState();
+        State matrix = history.getMatrix();
         if (!matrix.swipe(next)) {
             // nothing moved
             Log.info("nothing moved");
@@ -105,7 +105,7 @@ public class MainBoardFragment extends BoardFragment {
 
         // update history
         history.addStep(next.getByte());
-        history.setState(matrix);
+        history.setMatrix(matrix);
 
         SharedDatabase db = SharedDatabase.getInstance();
         db.saveHistory(history);

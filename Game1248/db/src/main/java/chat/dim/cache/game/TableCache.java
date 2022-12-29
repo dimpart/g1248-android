@@ -14,6 +14,8 @@ import chat.dim.g1248.model.Board;
 
 public class TableCache implements TableDBI {
 
+    public static final int MAX_BOARDS_COUNT = 4;
+
     // tid => sorted boards
     private final SparseArray<List<Board>> cachedBoards = new SparseArray<>();
 
@@ -22,7 +24,7 @@ public class TableCache implements TableDBI {
     private static void fillBoards(int tid, List<Board> boards) {
         int index;
         boolean exists;
-        for (index = 0; index < 4 && boards.size() < 4; ++index) {
+        for (index = 0; index < MAX_BOARDS_COUNT && boards.size() < MAX_BOARDS_COUNT; ++index) {
             exists = false;
             for (Board item : boards) {
                 if (item.getBid() == index) {
@@ -31,11 +33,12 @@ public class TableCache implements TableDBI {
                 }
             }
             if (!exists) {
-                boards.add(index, new Board(tid, index, 4));
+                boards.add(index, new Board(tid, index, Board.DEFAULT_SIZE));
             }
         }
     }
 
+    @Override
     public Board getBoard(int tid, int bid) {
         List<Board> boards = cachedBoards.get(tid);
         if (boards == null) {
@@ -66,7 +69,7 @@ public class TableCache implements TableDBI {
         } finally {
             writeLock.unlock();
         }
-        if (boards.size() != 4) {
+        if (boards.size() != MAX_BOARDS_COUNT) {
             throw new ArrayIndexOutOfBoundsException("boards error: " + boards);
         }
         return boards;

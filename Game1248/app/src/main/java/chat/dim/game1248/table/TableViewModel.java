@@ -38,7 +38,7 @@ public class TableViewModel extends ViewModel {
         }
 
         // new board
-        return new Board(tid, bid, 4);
+        return new Board(tid, bid, Board.DEFAULT_SIZE);
     }
 
     History getCurrentGameHistory(int tid, int bid, int gid) {
@@ -54,11 +54,11 @@ public class TableViewModel extends ViewModel {
             }
             // new game with first random number
             Step first = new Step(randomByte() & 0x3F);
-            State matrix = new State(4);
+            State matrix = new State(Board.DEFAULT_SIZE.width);
             matrix.showNumber(first);
-            history = new History();
+            history = new History(tid, bid, Board.DEFAULT_SIZE);
             history.addStep(first.getByte());
-            history.setState(matrix);
+            history.setMatrix(matrix);
         }
         if (history.getTid() != tid || history.getBid() != bid) {
             // move to current board
