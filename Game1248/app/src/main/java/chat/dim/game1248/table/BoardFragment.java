@@ -125,7 +125,7 @@ public class BoardFragment extends Fragment implements Observer {
         }
         int tid = (int) info.get("tid");
         int bid = (int) info.get("bid");
-        if (tid != tableId || bid != tableId) {
+        if (tid != tableId || bid != boardId) {
             // not mine
             return;
         }

@@ -122,6 +122,7 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
                 List<Board> boards = db.getBoards(tid);
                 if (boards != null) {
                     for (Board item : boards) {
+                        // TODO: or equals current user
                         if (item.getPlayer() == null) {
                             bid = item.getBid();
                             break;
@@ -154,6 +155,7 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
             PlayerOne theOne = PlayerOne.getInstance();
             theOne.table = db.getTable(tid);
             theOne.board = db.getBoard(tid, bid);
+            Log.info("playing table: " + theOne.table + ", board: " + theOne.board);
         }
 
         gestureDetector = new GestureDetector(TableActivity.this, this);

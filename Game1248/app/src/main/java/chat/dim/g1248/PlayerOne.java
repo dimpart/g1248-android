@@ -8,6 +8,7 @@ import chat.dim.g1248.model.History;
 import chat.dim.g1248.model.Table;
 import chat.dim.g1248.protocol.GameCustomizedContent;
 import chat.dim.g1248.protocol.GameHallContent;
+import chat.dim.g1248.protocol.GameHistoryContent;
 import chat.dim.g1248.protocol.GameTableContent;
 import chat.dim.mkm.User;
 import chat.dim.network.ClientSession;
@@ -83,18 +84,18 @@ public enum PlayerOne implements Delegate<StateMachine, StateTransition, PlayerS
         GameHallContent request = GameHallContent.seek(start, end);
         boolean ok = sendGameContent(request);
         if (ok) {
-            Log.info("seeking sent");
+            Log.info("seeking sent: start=" + start + ", end=" + end);
         } else {
-            Log.warning("seeking not send");
+            Log.warning("seeking not send: start=" + start + ", end=" + end);
         }
     }
     public void sendWatching(int tid, int bid) {
         GameTableContent request = GameTableContent.watch(tid, bid);
         boolean ok = sendGameContent(request);
         if (ok) {
-            Log.info("watching sent");
+            Log.info("watching sent: tid=" + tid + ", bid=" + bid);
         } else {
-            Log.warning("watching not send");
+            Log.warning("watching not send: tid=" + tid + ", bid=" + bid);
         }
     }
     public void sendPlaying(History history) {
@@ -104,6 +105,15 @@ public enum PlayerOne implements Delegate<StateMachine, StateTransition, PlayerS
             Log.info("playing sent");
         } else {
             Log.warning("playing not send");
+        }
+    }
+    public void sendFetching(int gid) {
+        GameHistoryContent request = GameHistoryContent.fetch(gid);
+        boolean ok = sendGameContent(request);
+        if (ok) {
+            Log.info("fetching sent: " + gid);
+        } else {
+            Log.warning("fetching not send: " + gid);
         }
     }
 
@@ -150,6 +160,7 @@ public enum PlayerOne implements Delegate<StateMachine, StateTransition, PlayerS
             // send request to the bot
             sendSeeking(0, 20);
         } else if (current.equals(PlayerState.WATCHING)) {
+            // TODO: previous == PLAYING?
             // send request to the bot
             Table watchTable = table;
             Board watchBoard = board;

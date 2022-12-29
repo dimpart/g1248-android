@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import chat.dim.cache.game.HistoryCache;
-import chat.dim.cache.game.TableCache;
 import chat.dim.g1248.NotificationNames;
 import chat.dim.g1248.PlayerOne;
 import chat.dim.g1248.SharedDatabase;
@@ -58,11 +57,14 @@ public class TableHandler extends GameTableContentHandler {
                     ID player = item.getPlayer();
                     if (player == null || theOne.equals(player)) {
                         // this board is mine now
+                        Log.info("skip my board: tid=" + tid + ", " + item);
                         continue;
                     }
                     // this board has been occupied by other player, refresh it
+                    Log.warning("this board is occupied by " + player);
                     theOne.board = item;
                 }
+                Log.info("update board: tid=" + tid + ", " + item);
 
                 database.updateBoard(tid, item);
 

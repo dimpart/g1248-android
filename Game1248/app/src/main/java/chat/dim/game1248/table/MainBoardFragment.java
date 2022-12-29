@@ -1,5 +1,8 @@
 package chat.dim.game1248.table;
 
+import java.util.Map;
+
+import chat.dim.g1248.NotificationNames;
 import chat.dim.g1248.PlayerOne;
 import chat.dim.g1248.PlayerState;
 import chat.dim.g1248.SharedDatabase;
@@ -21,14 +24,35 @@ public class MainBoardFragment extends BoardFragment {
 
     @Override
     public void onReceiveNotification(Notification notification) {
-        PlayerOne theOne = PlayerOne.getInstance();
-        PlayerState state = theOne.getCurrentState();
-        if (state == null || !state.equals(PlayerState.PLAYING)) {
-            // 'watching'
-            super.onReceiveNotification(notification);
-        } else {
-            Log.info("the player one is playing, don't refresh board");
+        String name = notification.name;
+        Map info = notification.userInfo;
+        assert name != null && info != null : "notification error: " + notification;
+        if (!name.equals(NotificationNames.GameBoardUpdated)) {
+            // should not happen
+            return;
         }
+        int tid = (int) info.get("tid");
+        int bid = (int) info.get("bid");
+        if (tid != tableId || bid != boardId) {
+            // not mine
+            return;
+        }
+        Board board = (Board) info.get("board");
+        assert board != null && board.getBid() == bid : "bid error: " + bid + ", " + board;
+        ID player = board.getPlayer();
+        if (player == null) {
+            // received data error?
+            Log.error("error board: " + board);
+            return;
+        }
+        PlayerOne theOne = PlayerOne.getInstance();
+        if (theOne.equals(player)) {
+            Log.info("skip my board");
+            return;
+        }
+
+        Log.info("[GAME] refreshing tid: " + tid + ", bid: " + bid);
+        reloadBoard(board);
     }
 
     @Override
@@ -50,7 +74,12 @@ public class MainBoardFragment extends BoardFragment {
         // 2. get game history with gid on the board
         int gid = board.getGid();
         History history = mViewModel.getCurrentGameHistory(tableId, boardId, gid);
-        Log.debug("history: " + history);
+        if (history == null) {
+            Log.error("history not found, fetching gid: " + gid);
+            theOne.sendFetching(gid);
+            return;
+        }
+        Log.info("history: " + history);
 
         // 3. refresh info from history
         State matrix = history.getMatrix();
@@ -88,7 +117,12 @@ public class MainBoardFragment extends BoardFragment {
         // 2. get game history with gid on the board
         int gid = board.getGid();
         History history = mViewModel.getCurrentGameHistory(tableId, boardId, gid);
-        Log.debug("history: " + history);
+        if (history == null) {
+            Log.error("history not found, fetching gid: " + gid);
+            theOne.sendFetching(gid);
+            return;
+        }
+        Log.info("history: " + history);
 
         // do swipe
         byte prefix = (byte) ((direction.value & 0x03) << 6);

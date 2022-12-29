@@ -40,10 +40,8 @@ public class TableCache implements TableDBI {
 
     @Override
     public Board getBoard(int tid, int bid) {
-        List<Board> boards = cachedBoards.get(tid);
-        if (boards == null) {
-            return null;
-        }
+        List<Board> boards = getBoards(tid);
+        assert boards.size() == MAX_BOARDS_COUNT : "boards error: " + boards;
         Iterator<Board> iterator = boards.iterator();
         Board item;
         while (iterator.hasNext()) {
@@ -52,7 +50,7 @@ public class TableCache implements TableDBI {
                 return item;
             }
         }
-        return null;
+        throw new IndexOutOfBoundsException("failed to get board: tid=" + tid + ", bid=" + bid);
     }
 
     @Override

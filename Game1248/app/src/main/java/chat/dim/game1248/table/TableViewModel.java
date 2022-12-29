@@ -2,7 +2,6 @@ package chat.dim.game1248.table;
 
 import androidx.lifecycle.ViewModel;
 
-import java.util.List;
 import java.util.Random;
 
 import chat.dim.g1248.SharedDatabase;
@@ -18,27 +17,7 @@ public class TableViewModel extends ViewModel {
 
         SharedDatabase database = SharedDatabase.getInstance();
 
-        List<Board> boards = database.getBoards(tid);
-        if (boards != null) {
-            // 1. get by 'bid'
-            for (Board item : boards) {
-                if (item.getBid() == bid) {
-                    return item;
-                }
-            }
-
-            // 2. get by index
-            if (0 <= bid && bid < boards.size()) {
-                Board candidate = boards.get(bid);
-                // if 'bid' not in the board info, then take it.
-                if (!candidate.containsKey("bid")) {
-                    return candidate;
-                }
-            }
-        }
-
-        // new board
-        return new Board(tid, bid, Board.DEFAULT_SIZE);
+        return database.getBoard(tid, bid);
     }
 
     History getCurrentGameHistory(int tid, int bid, int gid) {
@@ -59,8 +38,8 @@ public class TableViewModel extends ViewModel {
             history = new History(tid, bid, Board.DEFAULT_SIZE);
             history.addStep(first.getByte());
             history.setMatrix(matrix);
-        }
-        if (history.getTid() != tid || history.getBid() != bid) {
+            database.saveHistory(history);
+        } else if (history.getTid() != tid || history.getBid() != bid) {
             // move to current board
             history.setTid(tid);
             history.setBid(bid);

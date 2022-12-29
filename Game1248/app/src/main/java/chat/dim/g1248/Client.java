@@ -23,6 +23,7 @@ import chat.dim.dbi.MessageDBI;
 import chat.dim.dbi.SessionDBI;
 import chat.dim.filesys.ExternalStorage;
 import chat.dim.g1248.handler.HallHandler;
+import chat.dim.g1248.handler.HistoryHandler;
 import chat.dim.g1248.handler.TableHandler;
 import chat.dim.network.ClientSession;
 import chat.dim.network.SessionState;
@@ -181,6 +182,7 @@ public class Client extends Terminal {
         // Step 5: create customized content handlers
         shared.gameHallContentHandler = new HallHandler(db);
         shared.gameTableContentHandler = new TableHandler(db);
+        shared.gameHistoryContentHandler = new HistoryHandler(db);
 
         // Step 6: prepare player one
         PlayerOne theOne = PlayerOne.getInstance();
