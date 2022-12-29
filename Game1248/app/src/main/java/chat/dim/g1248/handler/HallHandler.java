@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import chat.dim.g1248.NotificationNames;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Table;
-import chat.dim.game1248.NotificationNames;
 import chat.dim.notification.NotificationCenter;
 import chat.dim.protocol.Content;
 import chat.dim.protocol.CustomizedContent;

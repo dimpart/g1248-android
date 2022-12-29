@@ -5,6 +5,7 @@ import android.util.SparseArray;
 import chat.dim.g1248.dbi.HistoryDBI;
 import chat.dim.g1248.model.History;
 import chat.dim.protocol.ID;
+import chat.dim.utils.Log;
 
 public class HistoryCache implements HistoryDBI {
 
@@ -23,20 +24,30 @@ public class HistoryCache implements HistoryDBI {
     }
 
     public boolean updatePlayingHistory(int tid, int bid, int gid, ID player) {
-        History history = historyCache.get(0);
+        // get playing history
+        History history = historyCache.get(gid);
         if (history == null) {
-            return false;
-        } else if (history.getTid() != tid || history.getBid() != bid) {
-            return false;
+            if (gid > 0) {
+                // get new history
+                history = historyCache.get(0);
+            }
+            if (history == null) {
+                Log.error("no new history: gid=" + gid +
+                        ", tid=" + tid + ", bid=" + bid + ", player=" + player);
+                return false;
+            }
+            // move new history to its position: gid
+            historyCache.remove(0);
         }
-        ID pid = history.getPlayer();
-        if (pid != null && !pid.equals(player)) {
-            return false;
-        }
-        historyCache.remove(0);
+        Log.info("update history: gid=" + gid +
+                ", tid=" + tid + ", bid=" + bid + ", player=" + player + ", history=" + history);
+
+        history.setTid(tid);
+        history.setBid(bid);
         history.setGid(gid);
         history.setPlayer(player);
         historyCache.put(gid, history);
+        Log.info("history updated: history=" + history);
         return true;
     }
 }

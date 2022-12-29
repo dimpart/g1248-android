@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import chat.dim.cache.game.HistoryCache;
-import chat.dim.g1248.GlobalVariable;
+import chat.dim.cache.game.TableCache;
+import chat.dim.g1248.NotificationNames;
+import chat.dim.g1248.PlayerOne;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
-import chat.dim.game1248.Client;
-import chat.dim.game1248.NotificationNames;
+import chat.dim.g1248.model.Table;
 import chat.dim.notification.NotificationCenter;
 import chat.dim.protocol.Content;
 import chat.dim.protocol.CustomizedContent;
@@ -46,17 +47,21 @@ public class TableHandler extends GameTableContentHandler {
             tid = ((Number) integer).intValue();
         }
 
-        GlobalVariable shared = GlobalVariable.getInstance();
-        Client client = (Client) shared.terminal;
+        PlayerOne theOne = PlayerOne.getInstance();
 
         Object array = content.get("boards");
         if (array instanceof List) {
             List<Board> boards = Board.convert((List<Object>) array);
             for (Board item : boards) {
-                if (tid == client.tid && item.getBid() == client.bid) {
-                    // FIXME:
-                    Log.debug("this board is playing");
-                    continue;
+                if (tid == theOne.getTid() && item.getBid() == theOne.getBid()) {
+                    Log.debug("this board is occupied, check player");
+                    ID player = item.getPlayer();
+                    if (player == null || theOne.equals(player)) {
+                        // this board is mine now
+                        continue;
+                    }
+                    // this board has been occupied by other player, refresh it
+                    theOne.board = item;
                 }
 
                 database.updateBoard(tid, item);
@@ -87,9 +92,24 @@ public class TableHandler extends GameTableContentHandler {
         int bid = (int) content.get("bid");
         int gid = (int) content.get("gid");
         ID player = ID.parse(content.get("player"));
-        if (tid > 0 && gid > 0 && player != null) {
-            HistoryCache cache = (HistoryCache) database.historyDatabase;
-            cache.updatePlayingHistory(tid, bid, gid, player);
+        if (tid <= 0 || bid < 0 || gid <= 0 || player == null) {
+            Log.error("play response error: " + content);
+            return null;
+        }
+
+        PlayerOne theOne = PlayerOne.getInstance();
+        Table table = theOne.table;
+        Board board = theOne.board;
+        if (table == null || board == null) {
+            Log.error("not playing now");
+        } else if (table.getTid() == tid && board.getBid() == bid/* && theOne.equals(player)*/) {
+            // update gid, if player changed, means this seat is token away by another player
+            board.setGid(gid);
+            board.setPlayer(player);
+            TableCache tdb = (TableCache) database.tableDatabase;
+            tdb.updateBoard(tid, board);
+            HistoryCache hdb = (HistoryCache) database.historyDatabase;
+            hdb.updatePlayingHistory(tid, bid, gid, player);
         }
         return null;
     }

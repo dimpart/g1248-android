@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import chat.dim.g1248.NotificationNames;
 import chat.dim.g1248.model.Table;
-import chat.dim.game1248.NotificationNames;
 import chat.dim.game1248.R;
 import chat.dim.notification.Notification;
 import chat.dim.notification.NotificationCenter;

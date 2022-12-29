@@ -1,6 +1,7 @@
 package chat.dim.cache.game;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import chat.dim.g1248.dbi.HallDBI;
@@ -13,13 +14,29 @@ public class HallCache implements HallDBI {
     // sorted tables
     private final List<Table> cachedTables = new ArrayList<>();
 
+    private final Table placeholder = new Table();
+
+    public Table getTable(int tid) {
+        if (tid == 0) {
+            return placeholder;
+        }
+        Iterator<Table> iterator = cachedTables.iterator();
+        Table item;
+        while (iterator.hasNext()) {
+            item = iterator.next();
+            if (item.getTid() == tid) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     @Override
     public List<Table> getTables(int start, int end) {
         List<Table> tables = new ArrayList<>();
         int total = cachedTables.size();
         if (total == 0) {
             // place an empty table
-            Table placeholder = new Table();
             tables.add(placeholder);
         } else {
             if (end > total) {

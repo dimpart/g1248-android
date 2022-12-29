@@ -10,10 +10,11 @@ import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.History;
 import chat.dim.g1248.model.State;
 import chat.dim.g1248.model.Step;
+import chat.dim.utils.Log;
 
 public class TableViewModel extends ViewModel {
 
-    public Board getBoard(int tid, int bid) {
+    Board getBoard(int tid, int bid) {
 
         SharedDatabase database = SharedDatabase.getInstance();
 
@@ -37,41 +38,39 @@ public class TableViewModel extends ViewModel {
         }
 
         // new board
-        return new Board(bid, 4);
+        return new Board(tid, bid, 4);
     }
 
-    public void saveHistory(History history) {
+    History getCurrentGameHistory(int tid, int bid, int gid) {
 
         SharedDatabase database = SharedDatabase.getInstance();
 
-        database.saveHistory(history);
-    }
-    public History getHistory(int tid, int bid, int gid) {
-
-        SharedDatabase database = SharedDatabase.getInstance();
-
+        // get history by gid
         History history = database.getHistory(gid);
-        //gid = history.getGid();
-        if (gid == 0) {
-            if (history == null) {
-                // new game with first random number
-                Step first = new Step(randomByte() & 0x3F);
-                State matrix = new State(4);
-                matrix.showNumber(first);
-                history = new History();
-                history.addStep(first.getByte());
-                history.setState(matrix);
-                saveHistory(history);
+        if (history == null) {
+            if (gid > 0) {
+                Log.error("history not found: gid=" + gid);
+                return null;
             }
+            // new game with first random number
+            Step first = new Step(randomByte() & 0x3F);
+            State matrix = new State(4);
+            matrix.showNumber(first);
+            history = new History();
+            history.addStep(first.getByte());
+            history.setState(matrix);
+        }
+        if (history.getTid() != tid || history.getBid() != bid) {
             // move to current board
             history.setTid(tid);
             history.setBid(bid);
+            database.saveHistory(history);
         }
 
         return history;
     }
 
-    public static byte randomByte() {
+    static byte randomByte() {
         Random random = new Random();
         return (byte) random.nextInt();
     }

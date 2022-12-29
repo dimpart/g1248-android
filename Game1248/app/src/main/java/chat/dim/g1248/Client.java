@@ -1,8 +1,7 @@
-package chat.dim.game1248;
+package chat.dim.g1248;
 
 import android.content.Context;
 
-import java.util.Map;
 import java.util.Set;
 
 import chat.dim.ClientMessenger;
@@ -23,79 +22,36 @@ import chat.dim.database.UserDatabase;
 import chat.dim.dbi.MessageDBI;
 import chat.dim.dbi.SessionDBI;
 import chat.dim.filesys.ExternalStorage;
-import chat.dim.g1248.AppMessageProcessor;
-import chat.dim.g1248.GlobalVariable;
-import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.handler.HallHandler;
 import chat.dim.g1248.handler.TableHandler;
-import chat.dim.g1248.model.History;
-import chat.dim.g1248.protocol.GameCustomizedContent;
-import chat.dim.g1248.protocol.GameHallContent;
-import chat.dim.g1248.protocol.GameTableContent;
 import chat.dim.network.ClientSession;
-import chat.dim.notification.Notification;
-import chat.dim.notification.NotificationCenter;
-import chat.dim.notification.Observer;
+import chat.dim.network.SessionState;
+import chat.dim.network.StateMachine;
 import chat.dim.protocol.ID;
 import chat.dim.sqlite.DatabaseConnector;
 import chat.dim.sqlite.account.AccountDatabase;
 import chat.dim.sqlite.message.MessageDatabase;
 import chat.dim.type.Triplet;
-import chat.dim.utils.Log;
 
-public class Client extends Terminal implements Observer {
+public class Client extends Terminal {
 
-    public int tid = -1;
-    public int bid = -1;
-
-    private final ID gameBot;
-
-    public Client(CommonFacebook barrack, SessionDBI sdb, ID bot) {
+    public Client(CommonFacebook barrack, SessionDBI sdb) {
         super(barrack, sdb);
-
-        gameBot = bot;
-
-        NotificationCenter nc = NotificationCenter.getInstance();
-        nc.addObserver(this, NotificationNames.PlayNextMove);
     }
 
     @Override
-    public void onReceiveNotification(Notification notification) {
-        String name = notification.name;
-        Map info = notification.userInfo;
-        assert name != null && info != null : "notification error: " + notification;
-        if (!name.equals(NotificationNames.PlayNextMove)) {
-            // should not happen
+    public void exitState(SessionState previous, StateMachine ctx) {
+        super.exitState(previous, ctx);
+        // called after state changed
+        SessionState current = ctx.getCurrentState();
+        if (current == null) {
             return;
         }
-        History history = (History) info.get("history");
-        assert history != null : "history not found";
-
-        GameTableContent request = GameTableContent.play(history);
-
-//        Log.info("[GAME] sending request: " + gameBot + ", " + request);
-//        ClientMessenger messenger = getMessenger();
-//        messenger.sendContent(null, gameBot, request, 0);
-    }
-
-    @Override
-    protected boolean isExpired(long last, long now) {
-        // keep online every minute
-        return now < (last + 60 * 1000);
-    }
-
-    @Override
-    protected void keepOnline(ID uid, ClientMessenger messenger) {
-        super.keepOnline(uid, messenger);
-
-        GameCustomizedContent request;
-        if (tid == -1 || bid == -1) {
-            request = GameHallContent.seek(0, 20);
-        } else {
-            request = GameTableContent.watch(tid, bid);
+        if (current.equals(SessionState.RUNNING)) {
+            // request tables for hall view
+            PlayerOne theOne = PlayerOne.getInstance();
+            theOne.sendSeeking(0, 20);
         }
-        Log.info("[GAME] sending request: " + gameBot + ", " + request);
-        messenger.sendContent(null, gameBot, request, 0);
     }
 
     @Override
@@ -181,7 +137,7 @@ public class Client extends Terminal implements Observer {
         return db;
     }
 
-    Triplet<String, Integer, ID> getNeighborStation() {
+    public Triplet<String, Integer, ID> getNeighborStation() {
         Set<Triplet<String, Integer, ID>> neighbors = database.allNeighbors();
         if (neighbors != null) {
             for (Triplet<String, Integer, ID> station : neighbors) {
@@ -193,7 +149,7 @@ public class Client extends Terminal implements Observer {
         return null;
     }
 
-    static void prepare(String iniFileContent, Context context) {
+    public static void prepare(String iniFileContent, Context context) {
         GlobalVariable shared = GlobalVariable.getInstance();
         if (shared.terminal != null) {
             // already loaded
@@ -216,7 +172,7 @@ public class Client extends Terminal implements Observer {
         shared.facebook = facebook;
 
         // Step 4: create terminal
-        Client client = new Client(facebook, db, bot);
+        Client client = new Client(facebook, db);
         Thread thread = new Thread(client);
         thread.setDaemon(false);
         thread.start();
@@ -225,5 +181,10 @@ public class Client extends Terminal implements Observer {
         // Step 5: create customized content handlers
         shared.gameHallContentHandler = new HallHandler(db);
         shared.gameTableContentHandler = new TableHandler(db);
+
+        // Step 6: prepare player one
+        PlayerOne theOne = PlayerOne.getInstance();
+        theOne.bot = bot;
+        //theOne.user = facebook.getCurrentUser();
     }
 }

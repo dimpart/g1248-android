@@ -36,7 +36,9 @@ import chat.dim.Register;
 import chat.dim.filesys.ExternalStorage;
 import chat.dim.format.Base64;
 import chat.dim.format.DataCoder;
+import chat.dim.g1248.Client;
 import chat.dim.g1248.GlobalVariable;
+import chat.dim.g1248.PlayerOne;
 import chat.dim.game1248.hall.TablesFragment;
 import chat.dim.io.Permissions;
 import chat.dim.mkm.User;
@@ -127,6 +129,8 @@ public class MainActivity extends AppCompatActivity
                 localUsers.add(uid);
                 shared.adb.saveLocalUsers(localUsers);
             }
+            PlayerOne theOne = PlayerOne.getInstance();
+            theOne.user = user;
             // get the nearest neighbor station
             String host;
             int port;

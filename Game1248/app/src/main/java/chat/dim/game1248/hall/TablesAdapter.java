@@ -12,13 +12,9 @@ import androidx.cardview.widget.CardView;
 
 import java.util.List;
 
-import chat.dim.Register;
-import chat.dim.g1248.GlobalVariable;
 import chat.dim.g1248.model.Table;
 import chat.dim.game1248.R;
 import chat.dim.game1248.table.TableActivity;
-import chat.dim.mkm.User;
-import chat.dim.protocol.ID;
 
 public class TablesAdapter extends ArrayAdapter<Table> {
 

@@ -3,6 +3,7 @@ package chat.dim.cache.game;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -18,7 +19,7 @@ public class TableCache implements TableDBI {
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    private void fillBoards(List<Board> boards) {
+    private static void fillBoards(int tid, List<Board> boards) {
         int index;
         boolean exists;
         for (index = 0; index < 4 && boards.size() < 4; ++index) {
@@ -30,9 +31,25 @@ public class TableCache implements TableDBI {
                 }
             }
             if (!exists) {
-                boards.add(index, new Board(index, 4));
+                boards.add(index, new Board(tid, index, 4));
             }
         }
+    }
+
+    public Board getBoard(int tid, int bid) {
+        List<Board> boards = cachedBoards.get(tid);
+        if (boards == null) {
+            return null;
+        }
+        Iterator<Board> iterator = boards.iterator();
+        Board item;
+        while (iterator.hasNext()) {
+            item = iterator.next();
+            if (item.getTid() == tid && item.getBid() == bid) {
+                return item;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -45,7 +62,7 @@ public class TableCache implements TableDBI {
         Lock writeLock = lock.writeLock();
         writeLock.lock();
         try {
-            fillBoards(boards);
+            fillBoards(tid, boards);
         } finally {
             writeLock.unlock();
         }

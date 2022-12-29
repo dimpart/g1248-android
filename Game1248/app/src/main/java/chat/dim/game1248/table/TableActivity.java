@@ -14,11 +14,12 @@ import android.view.View;
 
 import java.util.List;
 
-import chat.dim.g1248.GlobalVariable;
+import chat.dim.cache.game.HallCache;
+import chat.dim.cache.game.TableCache;
+import chat.dim.g1248.PlayerOne;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.Step;
-import chat.dim.game1248.Client;
 import chat.dim.game1248.R;
 import chat.dim.utils.Log;
 
@@ -110,6 +111,8 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
 
         if (savedInstanceState == null) {
 
+            SharedDatabase db = SharedDatabase.getInstance();
+
             // get extra info
             Intent intent = getIntent();
             int tid = intent.getIntExtra("tid", 0);
@@ -117,7 +120,6 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
             if (bid < 0) {
                 // seek empty seat
                 bid = 0;
-                SharedDatabase db = SharedDatabase.getInstance();
                 List<Board> boards = db.getBoards(tid);
                 if (boards != null) {
                     for (Board item : boards) {
@@ -150,12 +152,11 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
             View trackPad = findViewById(R.id.trackpad);
             trackPad.setOnTouchListener(this::onTouch);
 
-            GlobalVariable shared = GlobalVariable.getInstance();
-            Client client = (Client) shared.terminal;
-            if (client != null) {
-                client.tid = tid;
-                client.bid = bid;
-            }
+            HallCache hallCache = (HallCache) db.hallDatabase;
+            TableCache tableCache = (TableCache) db.tableDatabase;
+            PlayerOne theOne = PlayerOne.getInstance();
+            theOne.table = hallCache.getTable(tid);
+            theOne.board = tableCache.getBoard(tid, bid);
         }
 
         gestureDetector = new GestureDetector(TableActivity.this, this);
@@ -164,12 +165,9 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
     @Override
     protected void onDestroy() {
 
-        GlobalVariable shared = GlobalVariable.getInstance();
-        Client client = (Client) shared.terminal;
-        if (client != null) {
-            client.tid = -1;
-            client.bid = -1;
-        }
+        PlayerOne theOne = PlayerOne.getInstance();
+        theOne.table = null;
+        theOne.board = null;
 
         super.onDestroy();
     }
