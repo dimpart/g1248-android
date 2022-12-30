@@ -111,23 +111,43 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
         if (savedInstanceState == null) {
 
             SharedDatabase db = SharedDatabase.getInstance();
+            PlayerOne theOne = PlayerOne.getInstance();
 
             // get extra info
             Intent intent = getIntent();
             int tid = intent.getIntExtra("tid", 0);
             int bid = intent.getIntExtra("bid", -1);
-            if (bid < 0) {
-                // seek empty seat
-                bid = 0;
+            while (bid < 0) {
+                // get boards for this table
                 List<Board> boards = db.getBoards(tid);
-                if (boards != null) {
-                    for (Board item : boards) {
-                        // TODO: or equals current user
-                        if (item.getPlayer() == null) {
-                            bid = item.getBid();
-                            break;
-                        }
+                if (boards == null) {
+                    Log.error("no boards found: tid=" + tid);
+                    bid = 0;
+                    break;
+                }
+                // seek my seat
+                for (Board item : boards) {
+                    if (theOne.equals(item.getPlayer())) {
+                        // it's my board
+                        bid = item.getBid();
+                        break;
                     }
+                }
+                if (bid >= 0) {
+                    // got my board back
+                    break;
+                }
+                // seek empty seat
+                for (Board item : boards) {
+                    if (item.getPlayer() == null) {
+                        // it's an empty board
+                        bid = item.getBid();
+                        break;
+                    }
+                }
+                if (bid < 0) {
+                    Log.warning("no board available: tid=" + tid);
+                    bid = 0;
                 }
             }
             Log.info("[GAME] enter tid: " + tid + ", bid: " + bid);
@@ -152,7 +172,6 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
             View trackPad = findViewById(R.id.trackpad);
             trackPad.setOnTouchListener(this::onTouch);
 
-            PlayerOne theOne = PlayerOne.getInstance();
             theOne.table = db.getTable(tid);
             theOne.board = db.getBoard(tid, bid);
             Log.info("playing table: " + theOne.table + ", board: " + theOne.board);

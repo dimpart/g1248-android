@@ -37,7 +37,7 @@ public class HallHandler extends GameHallContentHandler {
         Object array = content.get("tables");
         List<Table> tables;
         if (array instanceof List) {
-            tables = Table.convert((List<Object>) array);
+            tables = Table.convertTables((List<Object>) array);
             for (Table item : tables) {
                 database.updateTable(item.getTid(), item.getBoards(), item.getBest());
             }

@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import chat.dim.g1248.dbi.TableDBI;
 import chat.dim.g1248.model.Board;
+import chat.dim.utils.Log;
 
 public class TableCache implements TableDBI {
 
@@ -87,14 +88,21 @@ public class TableCache implements TableDBI {
 
         int total = array.size();
         int index;
-        int oid;
+        Board old;
         for (index = 0; index < total; ++index) {
-            oid = array.get(index).getBid();
-            if (oid < bid) {
+            old = array.get(index);
+            if (old.getBid() < bid) {
+                // bid not match
                 continue;
-            } else if (oid == bid) {
-                // old record exists, remove it
-                array.remove(index);
+            } else if (old.getBid() == bid) {
+                // old record exists, check time
+                if (board.after(old.getTime())) {
+                    // ok, update it
+                    array.remove(index);
+                } else {
+                    Log.warning("Board expired: old time=" + old.getTime() + ", new time=" + board.getTime());
+                    return false;
+                }
             }
             break;
         }

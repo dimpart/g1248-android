@@ -19,8 +19,16 @@ public class HistoryCache implements HistoryDBI {
 
     @Override
     public boolean saveHistory(History history) {
-        historyCache.put(history.getGid(), history);
-        return true;
+        History old = historyCache.get(history.getGid());
+        // check time when old record exists
+        if (history.after(old)) {
+            // ok, save it
+            historyCache.put(history.getGid(), history);
+            return true;
+        } else {
+            Log.warning("history expired: old time=" + old.getTime() + ", new time=" + history.getTime());
+            return false;
+        }
     }
 
     public boolean updatePlayingHistory(int tid, int bid, int gid, ID player) {

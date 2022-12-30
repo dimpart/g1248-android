@@ -38,8 +38,10 @@ public class HistoryHandler extends GameHistoryContentHandler {
             Log.error("fetch response error: " + content);
             return null;
         }
-        database.saveHistory(history);
-
+        if (!database.saveHistory(history)) {
+            Log.error("failed to save history: " + history);
+            return null;
+        }
 
         Map<String, Object> info = new HashMap<>();
         info.put("history", history);

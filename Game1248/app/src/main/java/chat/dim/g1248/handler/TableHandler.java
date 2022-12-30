@@ -50,7 +50,7 @@ public class TableHandler extends GameTableContentHandler {
 
         Object array = content.get("boards");
         if (array instanceof List) {
-            List<Board> boards = Board.convert((List<Object>) array);
+            List<Board> boards = Board.convertBoards((List<Object>) array);
             for (Board item : boards) {
                 if (tid == theOne.getTid() && item.getBid() == theOne.getBid()) {
                     Log.debug("this board is occupied, check player");
@@ -66,7 +66,10 @@ public class TableHandler extends GameTableContentHandler {
                 }
                 Log.info("update board: tid=" + tid + ", " + item);
 
-                database.updateBoard(tid, item);
+                if (!database.updateBoard(tid, item)) {
+                    Log.error("failed to update board: tid=" + tid + ", " + item);
+                    continue;
+                }
 
                 Map<String, Object> info = new HashMap<>();
                 info.put("tid", tid);
