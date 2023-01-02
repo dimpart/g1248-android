@@ -46,16 +46,19 @@ public class TableHandler extends GameTableContentHandler {
             tid = ((Number) integer).intValue();
         }
 
-        PlayerOne theOne = PlayerOne.getInstance();
-
         Object array = content.get("boards");
         if (array instanceof List) {
+            PlayerOne theOne = PlayerOne.getInstance();
+            int myTid = theOne.getTid();
+            int myBid = theOne.getBid();
+            int myGid = theOne.getGid();
+
             List<Board> boards = Board.convertBoards((List<Object>) array);
             for (Board item : boards) {
-                if (tid == theOne.getTid() && item.getBid() == theOne.getBid()) {
-                    Log.debug("this board is occupied, check player");
+                if (tid == myTid && item.getBid() == myBid) {
+                    Log.debug("this board is conflict, check player");
                     ID player = item.getPlayer();
-                    if (player == null || theOne.equals(player)) {
+                    if (player == null || theOne.equals(player) || myGid > 0) {
                         // this board is mine now
                         Log.info("skip my board: tid=" + tid + ", " + item);
                         continue;
@@ -108,9 +111,9 @@ public class TableHandler extends GameTableContentHandler {
         if (table == null || board == null) {
             Log.error("not playing now");
         } else if (table.getTid() != tid || board.getBid() != bid) {
-            Log.error("play response error: " + content);
-        } else if (theOne.equals(player)) {
-            // update gid
+            Log.error("play response not match: " + content);
+        } else if (board.getGid() == 0) {
+            Log.info("update current board: gid=" + gid + ", player=" + player);
             board.setGid(gid);
             board.setPlayer(player);
             database.updateBoard(tid, board);

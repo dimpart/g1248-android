@@ -54,6 +54,10 @@ public enum PlayerOne implements Delegate<StateMachine, StateTransition, PlayerS
         Board current = board;
         return current == null ? -1 : current.getBid();
     }
+    public int getGid() {
+        Board current = board;
+        return current == null ? -1 : current.getGid();
+    }
 
     private static boolean sendContent(ID sender, ID receiver, Content content) {
         GlobalVariable shared = GlobalVariable.getInstance();

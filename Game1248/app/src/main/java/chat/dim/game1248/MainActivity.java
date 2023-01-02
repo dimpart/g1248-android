@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,13 +34,13 @@ import java.util.List;
 import chat.dim.CommonFacebook;
 import chat.dim.Config;
 import chat.dim.Register;
-import chat.dim.filesys.ExternalStorage;
 import chat.dim.format.Base64;
 import chat.dim.format.DataCoder;
 import chat.dim.g1248.Client;
 import chat.dim.g1248.GlobalVariable;
 import chat.dim.g1248.PlayerOne;
 import chat.dim.game1248.hall.TablesFragment;
+import chat.dim.http.HTTPClient;
 import chat.dim.io.Permissions;
 import chat.dim.mkm.User;
 import chat.dim.protocol.ID;
@@ -131,6 +132,12 @@ public class MainActivity extends AppCompatActivity
             }
             PlayerOne theOne = PlayerOne.getInstance();
             theOne.user = user;
+            // show user ID
+            String uid = user.getIdentifier().toString();
+            MainThread.call(() -> {
+                TextView textView = findViewById(R.id.nav_user_id);
+                textView.setText(uid);
+            });
             // get the nearest neighbor station
             String host;
             int port;
@@ -209,6 +216,12 @@ public class MainActivity extends AppCompatActivity
 
         Log.LEVEL = Log.DEVELOP;
 
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+        path += File.separator + "chat.dim.game1248";
+
+        HTTPClient http = HTTPClient.getInstance();
+        http.setRoot(path);
+
         // prepare plugins
         GlobalVariable shared = GlobalVariable.getInstance();
         assert shared != null;
@@ -225,9 +238,5 @@ public class MainActivity extends AppCompatActivity
                 return android.util.Base64.decode(string, android.util.Base64.DEFAULT);
             }
         };
-
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        path += File.separator + "chat.dim.game1248";
-        ExternalStorage.setRoot(path);
     }
 }

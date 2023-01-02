@@ -40,14 +40,35 @@ public class TableCache implements TableDBI {
     }
 
     @Override
+    public List<Board> getBoards(int tid) {
+        List<Board> boards = cachedBoards.get(tid);
+        if (boards == null || boards.size() < MAX_BOARDS_COUNT) {
+            // lock to fill
+            Lock writeLock = lock.writeLock();
+            writeLock.lock();
+            try {
+                if (boards == null) {
+                    boards = new ArrayList<>();
+                    cachedBoards.put(tid, boards);
+                }
+                fillBoards(tid, boards);
+            } finally {
+                writeLock.unlock();
+            }
+        }
+        //assert boards.size() == MAX_BOARDS_COUNT : "boards error: " + boards;
+        return boards;
+    }
+
+    @Override
     public Board getBoard(int tid, int bid) {
         List<Board> boards = getBoards(tid);
-        assert boards.size() == MAX_BOARDS_COUNT : "boards error: " + boards;
+        //assert boards.size() == MAX_BOARDS_COUNT : "boards error: " + boards;
         Iterator<Board> iterator = boards.iterator();
         Board item;
         while (iterator.hasNext()) {
             item = iterator.next();
-            if (item.getTid() == tid && item.getBid() == bid) {
+            if (/*item.getTid() == tid && */item.getBid() == bid) {
                 return item;
             }
         }
@@ -55,58 +76,33 @@ public class TableCache implements TableDBI {
     }
 
     @Override
-    public List<Board> getBoards(int tid) {
-        List<Board> boards = cachedBoards.get(tid);
-        if (boards == null) {
-            boards = new ArrayList<>();
-            cachedBoards.put(tid, boards);
-        }
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
-        try {
-            fillBoards(tid, boards);
-        } finally {
-            writeLock.unlock();
-        }
-        if (boards.size() != MAX_BOARDS_COUNT) {
-            throw new ArrayIndexOutOfBoundsException("boards error: " + boards);
-        }
-        return boards;
-    }
-
-    @Override
     public boolean updateBoard(int tid, Board board) {
-        List<Board> array = cachedBoards.get(tid);
-        if (array == null) {
-            // no records
-            array = new ArrayList<>();
-            array.add(board);
-            cachedBoards.put(tid, array);
-            return true;
+        if (board.getGid() <= 0) {
+            Log.error("board error: tid=" + tid + ", " + board);
+            return false;
         }
+        List<Board> array = getBoards(tid);
         int bid = board.getBid();
-
-        int total = array.size();
-        int index;
-        Board old;
-        for (index = 0; index < total; ++index) {
-            old = array.get(index);
-            if (old.getBid() < bid) {
-                // bid not match
-                continue;
-            } else if (old.getBid() == bid) {
-                // old record exists, check time
-                if (board.after(old.getTime())) {
-                    // ok, update it
-                    array.remove(index);
-                } else {
-                    Log.warning("Board expired: old time=" + old.getTime() + ", new time=" + board.getTime());
-                    return false;
-                }
-            }
-            break;
+        if (bid < 0 || bid >= array.size()) {
+            Log.error("board error: tid=" + tid + ", " + board);
+            return false;
         }
-        array.add(index, board);
-        return true;
+        Board old = array.get(bid);
+        // if old board's gid is 0, means the bot not respond new gid yet
+        // if new time not after current time, it's expired.
+        if (old.getGid() <= 0 || !board.before(old.getTime())) {
+            // lock to update
+            Lock writeLock = lock.writeLock();
+            writeLock.lock();
+            try {
+                array.set(bid, board);
+            } finally {
+                writeLock.unlock();
+            }
+            return true;
+        } else {
+            Log.warning("Board expired: old time=" + old.getTime() + ", new time=" + board.getTime());
+            return false;
+        }
     }
 }

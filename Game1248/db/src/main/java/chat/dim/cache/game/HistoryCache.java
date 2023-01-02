@@ -35,10 +35,8 @@ public class HistoryCache implements HistoryDBI {
         // get playing history
         History history = historyCache.get(gid);
         if (history == null) {
-            if (gid > 0) {
-                // get new history
-                history = historyCache.get(0);
-            }
+            // get new history if exists
+            history = historyCache.get(0);
             if (history == null) {
                 Log.error("no new history: gid=" + gid +
                         ", tid=" + tid + ", bid=" + bid + ", player=" + player);

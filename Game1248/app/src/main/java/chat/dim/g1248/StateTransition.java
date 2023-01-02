@@ -35,7 +35,7 @@ import chat.dim.protocol.ID;
  *      2.3 - when current board is available, change state to 'playing';
  *
  *      3.1 - when left the table (back to the hall), 'seeking' tables again;
- *      3.2 - when click another board that is occupied, 'watching' another player playing.
+ *      3.2 - when current board is occupied by another player, change state to 'watching'.
  */
 abstract class StateTransition extends BaseTransition<StateMachine> {
 

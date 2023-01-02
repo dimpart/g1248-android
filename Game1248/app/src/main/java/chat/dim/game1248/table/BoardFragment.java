@@ -73,14 +73,16 @@ public class BoardFragment extends Fragment implements Observer {
         adapter = new BoardAdapter(getContext(), R.layout.griditem_squares, state);
         boardView.setAdapter(adapter);
         // load data in background
-        BackgroundThreads.rush(() -> {
-            Board board = mViewModel.getBoard(tableId, boardId);
-            assert board != null : "failed to get board: tid=" + tableId + ", bid=" + boardId;
-            reloadBoard(board);
-        });
+        BackgroundThreads.rush(this::loadBoard);
     }
 
-    protected void reloadBoard(Board board) {
+    void loadBoard() {
+        Board board = mViewModel.getBoard(tableId, boardId);
+        assert board != null : "failed to get board: tid=" + tableId + ", bid=" + boardId;
+        reloadBoard(board);
+    }
+
+    void reloadBoard(Board board) {
         // get info from the board
         List<Square> squares = board.getSquares();
         state.clear();

@@ -152,7 +152,7 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
             }
             Log.info("[GAME] enter tid: " + tid + ", bid: " + bid);
 
-            boardFragment = new MainBoardFragment(tid, bid % TableCache.MAX_BOARDS_COUNT);
+            boardFragment = new MainBoardFragment(tid, bid);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.main_board, boardFragment)
                     .commitNow();

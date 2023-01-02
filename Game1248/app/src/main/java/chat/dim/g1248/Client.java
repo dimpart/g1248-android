@@ -1,7 +1,9 @@
 package chat.dim.g1248;
 
 import android.content.Context;
+import android.os.Environment;
 
+import java.io.File;
 import java.util.Set;
 
 import chat.dim.ClientMessenger;
@@ -21,7 +23,6 @@ import chat.dim.database.PrivateKeyDatabase;
 import chat.dim.database.UserDatabase;
 import chat.dim.dbi.MessageDBI;
 import chat.dim.dbi.SessionDBI;
-import chat.dim.filesys.ExternalStorage;
 import chat.dim.g1248.handler.HallHandler;
 import chat.dim.g1248.handler.HistoryHandler;
 import chat.dim.g1248.handler.TableHandler;
@@ -111,8 +112,15 @@ public class Client extends Terminal {
         String pubDir = config.getDatabasePublic();
         String priDir = config.getDatabasePrivate();
 
-        // FIXME: Environment.getExternalStorageDirectory().getAbsolutePath();
-        ExternalStorage.setRoot(rootDir);
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+        if (path.endsWith(File.separator)) {
+            path = path.substring(0, path.length() - 1);
+        }
+        // replace "/sdcard"
+        rootDir = path + rootDir.substring(7);
+        pubDir = path + pubDir.substring(7);
+        priDir = path + priDir.substring(7);
+
 
         String adbFile = config.getString("sqlite", "account");
         String mdbFile = config.getString("sqlite", "message");

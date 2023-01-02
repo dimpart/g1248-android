@@ -1,5 +1,6 @@
 package chat.dim.game1248.table;
 
+import java.util.List;
 import java.util.Map;
 
 import chat.dim.g1248.NotificationNames;
@@ -8,8 +9,10 @@ import chat.dim.g1248.PlayerState;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.History;
+import chat.dim.g1248.model.Square;
 import chat.dim.g1248.model.State;
 import chat.dim.g1248.model.Step;
+import chat.dim.g1248.model.Table;
 import chat.dim.notification.Notification;
 import chat.dim.protocol.ID;
 import chat.dim.threading.BackgroundThreads;
@@ -37,17 +40,10 @@ public class MainBoardFragment extends BoardFragment {
             // not mine
             return;
         }
-        Board board = (Board) info.get("board");
-        assert board != null && board.getBid() == bid : "bid error: " + bid + ", " + board;
-        ID player = board.getPlayer();
-        if (player == null) {
-            // received data error?
-            Log.error("error board: " + board);
-            return;
-        }
         PlayerOne theOne = PlayerOne.getInstance();
-        if (theOne.equals(player)) {
-            Log.info("skip my board");
+        Board board = theOne.board;
+        if (board == null || board.getGid() <= 0) {
+            Log.error("error board: " + board);
             return;
         }
 
@@ -56,39 +52,20 @@ public class MainBoardFragment extends BoardFragment {
     }
 
     @Override
-    protected void reloadBoard(Board board) {
+    void loadBoard() {
         PlayerOne theOne = PlayerOne.getInstance();
-        PlayerState playerState = theOne.getCurrentState();
-        if (playerState == null || !playerState.equals(PlayerState.PLAYING)) {
-            // 'watching'
-            super.reloadBoard(board);
+        Table table = theOne.table;
+        Board board = theOne.board;
+        assert table != null && board != null : "player one error: " + table + ", " + board;
+        if (!(board instanceof History)) {
+            History history = mViewModel.getCurrentGameHistory(tableId, boardId, board.getGid());
+            if (history != null) {
+                board = history;
+                theOne.board = history;
+            }
         }
-
-        // 1. check player on the game board
-        ID player = board.getPlayer();
-        if (player != null && !theOne.equals(player)) {
-            Log.error("player not match: " + player);
-            return;
-        }
-
-        // 2. get game history with gid on the board
-        int gid = board.getGid();
-        History history = mViewModel.getCurrentGameHistory(tableId, boardId, gid);
-        if (history == null) {
-            Log.error("history not found, fetching gid: " + gid);
-            theOne.sendFetching(gid);
-            return;
-        }
-        Log.info("history: " + history);
-
-        // 3. refresh info from history
-        State matrix = history.getMatrix();
-        state.clear();
-        state.addAll(matrix.toArray());
-        score = history.getScore();
-        steps = history.getSteps();
-
-        MainThread.call(this::onReload);
+        Log.info("show my board: " + board);
+        reloadBoard(board);
     }
 
     void onSwipe(Step.Direction direction) {
@@ -99,10 +76,19 @@ public class MainBoardFragment extends BoardFragment {
     private void doSwipe(Step.Direction direction) {
         PlayerOne theOne = PlayerOne.getInstance();
         PlayerState playerState = theOne.getCurrentState();
-        if (playerState == null || !playerState.equals(PlayerState.PLAYING)) {
-            // 'watching'
-            Log.warning("the player one is watching, cannot play game");
-            return;
+        if (playerState != null) {
+            if (playerState.equals(PlayerState.DEFAULT)) {
+                // TODO: show message to user
+                Log.warning("failed to create local user?");
+            } else if (playerState.equals(PlayerState.SEEKING)) {
+                // 'seeking'
+                Log.error("should not happen: " + playerState);
+                return;
+            } else if (playerState.equals(PlayerState.WATCHING)) {
+                // 'watching'
+                Log.warning("the player one is watching, cannot play game");
+                return;
+            }
         }
 
         // 1. check player on the game board
@@ -130,7 +116,9 @@ public class MainBoardFragment extends BoardFragment {
         Step next = new Step(prefix | suffix);
 
         State matrix = history.getMatrix();
-        if (!matrix.swipe(next)) {
+        List<Square.Movement> movements = matrix.swipe(next);
+        Log.info("movements: " + movements);
+        if (movements.size() == 0) {
             // nothing moved
             Log.info("nothing moved");
             return;

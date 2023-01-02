@@ -33,7 +33,7 @@ public class TableViewModel extends ViewModel {
             }
             // new game with first random number
             Step first = new Step(randomByte() & 0x3F);
-            State matrix = new State(Board.DEFAULT_SIZE.width);
+            State matrix = new State(Board.DEFAULT_SIZE);
             matrix.showNumber(first);
             history = new History(tid, bid, Board.DEFAULT_SIZE);
             history.addStep(first.getByte());
