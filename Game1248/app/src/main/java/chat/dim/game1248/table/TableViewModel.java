@@ -2,12 +2,10 @@ package chat.dim.game1248.table;
 
 import androidx.lifecycle.ViewModel;
 
-import java.util.Random;
-
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.History;
-import chat.dim.g1248.model.State;
+import chat.dim.g1248.model.Stage;
 import chat.dim.g1248.model.Step;
 import chat.dim.utils.Log;
 
@@ -32,8 +30,8 @@ public class TableViewModel extends ViewModel {
                 return null;
             }
             // new game with first random number
-            Step first = new Step(randomByte() & 0x3F);
-            State matrix = new State(Board.DEFAULT_SIZE);
+            Step first = Step.first();
+            Stage matrix = new Stage(Board.DEFAULT_SIZE);
             matrix.showNumber(first);
             history = new History(tid, bid, Board.DEFAULT_SIZE);
             history.addStep(first.getByte());
@@ -47,10 +45,5 @@ public class TableViewModel extends ViewModel {
         }
 
         return history;
-    }
-
-    static byte randomByte() {
-        Random random = new Random();
-        return (byte) random.nextInt();
     }
 }

@@ -20,7 +20,7 @@ import java.util.Map;
 
 import chat.dim.g1248.NotificationNames;
 import chat.dim.g1248.model.Board;
-import chat.dim.g1248.model.Square;
+import chat.dim.g1248.model.Stage;
 import chat.dim.game1248.R;
 import chat.dim.notification.Notification;
 import chat.dim.notification.NotificationCenter;
@@ -42,7 +42,7 @@ public class BoardFragment extends Fragment implements Observer {
     int boardId;
     int score;
     byte[] steps;
-    final List<Integer> state = new ArrayList<>();
+    final List<Integer> matrix = new ArrayList<>();
 
     public BoardFragment(int tid, int bid) {
         super();
@@ -70,7 +70,7 @@ public class BoardFragment extends Fragment implements Observer {
         // TODO: Use the ViewModel
 
         // create adapter
-        adapter = new BoardAdapter(getContext(), R.layout.griditem_squares, state);
+        adapter = new BoardAdapter(getContext(), R.layout.griditem_squares, matrix);
         boardView.setAdapter(adapter);
         // load data in background
         BackgroundThreads.rush(this::loadBoard);
@@ -84,9 +84,9 @@ public class BoardFragment extends Fragment implements Observer {
 
     void reloadBoard(Board board) {
         // get info from the board
-        List<Square> squares = board.getSquares();
-        state.clear();
-        state.addAll(Square.revert(squares));
+        Stage stage = board.getMatrix();
+        matrix.clear();
+        matrix.addAll(stage.toArray());
         score = board.getScore();
         //steps = history.getSteps();
 

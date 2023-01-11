@@ -10,7 +10,7 @@ import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.History;
 import chat.dim.g1248.model.Square;
-import chat.dim.g1248.model.State;
+import chat.dim.g1248.model.Stage;
 import chat.dim.g1248.model.Step;
 import chat.dim.g1248.model.Table;
 import chat.dim.notification.Notification;
@@ -111,23 +111,21 @@ public class MainBoardFragment extends BoardFragment {
         Log.info("history: " + history);
 
         // do swipe
-        byte prefix = (byte) ((direction.value & 0x03) << 6);
-        byte suffix = (byte) (TableViewModel.randomByte() & 0x3F);
-        Step next = new Step(prefix | suffix);
+        Step next = Step.next(direction);
 
-        State matrix = history.getMatrix();
-        List<Square.Movement> movements = matrix.swipe(next);
+        Stage stage = history.getMatrix();
+        List<Square.Movement> movements = stage.swipe(next);
         Log.info("movements: " + movements);
         if (movements.size() == 0) {
             // nothing moved
             Log.info("nothing moved");
             return;
         }
-        matrix.showNumber(next);
+        stage.showNumber(next);
 
         // update history
         history.addStep(next.getByte());
-        history.setMatrix(matrix);
+        history.setMatrix(stage);
 
         SharedDatabase db = SharedDatabase.getInstance();
         db.saveHistory(history);
@@ -136,8 +134,8 @@ public class MainBoardFragment extends BoardFragment {
         theOne.sendPlaying(history);
 
         // 3. refresh info from history
-        state.clear();
-        state.addAll(matrix.toArray());
+        matrix.clear();
+        matrix.addAll(stage.toArray());
         score = history.getScore();
         steps = history.getSteps();
 
