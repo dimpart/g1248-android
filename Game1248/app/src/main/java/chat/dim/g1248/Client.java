@@ -14,7 +14,7 @@ import chat.dim.Processor;
 import chat.dim.Terminal;
 import chat.dim.cache.game.HallCache;
 import chat.dim.cache.game.HistoryCache;
-import chat.dim.cache.game.TableCache;
+import chat.dim.cache.game.RoomCache;
 import chat.dim.database.CipherKeyDatabase;
 import chat.dim.database.DocumentDatabase;
 import chat.dim.database.GroupDatabase;
@@ -25,7 +25,7 @@ import chat.dim.dbi.MessageDBI;
 import chat.dim.dbi.SessionDBI;
 import chat.dim.g1248.handler.HallHandler;
 import chat.dim.g1248.handler.HistoryHandler;
-import chat.dim.g1248.handler.TableHandler;
+import chat.dim.g1248.handler.RoomHandler;
 import chat.dim.network.ClientSession;
 import chat.dim.network.SessionState;
 import chat.dim.network.StateMachine;
@@ -50,7 +50,7 @@ public class Client extends Terminal {
             return;
         }
         if (current.equals(SessionState.RUNNING)) {
-            // request tables for hall view
+            // request rooms for hall view
             PlayerOne theOne = PlayerOne.getInstance();
             theOne.sendSeeking(0, 20);
         }
@@ -141,7 +141,7 @@ public class Client extends Terminal {
         db.cipherKeyDatabase = new CipherKeyDatabase(rootDir, pubDir, priDir, mdb);
 
         db.hallDatabase = new HallCache();
-        db.tableDatabase = new TableCache();
+        db.roomDatabase = new RoomCache();
         db.historyDatabase = new HistoryCache();
         return db;
     }
@@ -189,7 +189,7 @@ public class Client extends Terminal {
 
         // Step 5: create customized content handlers
         shared.gameHallContentHandler = new HallHandler(db);
-        shared.gameTableContentHandler = new TableHandler(db);
+        shared.gameRoomContentHandler = new RoomHandler(db);
         shared.gameHistoryContentHandler = new HistoryHandler(db);
 
         // Step 6: prepare player one

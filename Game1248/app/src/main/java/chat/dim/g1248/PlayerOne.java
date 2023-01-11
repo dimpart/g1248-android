@@ -5,11 +5,11 @@ import chat.dim.Terminal;
 import chat.dim.fsm.Delegate;
 import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.History;
-import chat.dim.g1248.model.Table;
+import chat.dim.g1248.model.Room;
 import chat.dim.g1248.protocol.GameCustomizedContent;
 import chat.dim.g1248.protocol.GameHallContent;
 import chat.dim.g1248.protocol.GameHistoryContent;
-import chat.dim.g1248.protocol.GameTableContent;
+import chat.dim.g1248.protocol.GameRoomContent;
 import chat.dim.mkm.User;
 import chat.dim.network.ClientSession;
 import chat.dim.network.SessionState;
@@ -28,7 +28,7 @@ public enum PlayerOne implements Delegate<StateMachine, StateTransition, PlayerS
     public ID bot = null;
     public User user = null;
 
-    public Table table = null;
+    public Room room = null;
     public Board board = null;
 
     private StateMachine fsm;
@@ -46,9 +46,9 @@ public enum PlayerOne implements Delegate<StateMachine, StateTransition, PlayerS
         }
     }
 
-    public int getTid() {
-        Table current = table;
-        return current == null ? -1 : current.getTid();
+    public int getRid() {
+        Room current = room;
+        return current == null ? -1 : current.getRid();
     }
     public int getBid() {
         Board current = board;
@@ -93,17 +93,17 @@ public enum PlayerOne implements Delegate<StateMachine, StateTransition, PlayerS
             Log.warning("seeking not send: start=" + start + ", end=" + end);
         }
     }
-    public void sendWatching(int tid, int bid) {
-        GameTableContent request = GameTableContent.watch(tid, bid);
+    public void sendWatching(int rid, int bid) {
+        GameRoomContent request = GameRoomContent.watch(rid, bid);
         boolean ok = sendGameContent(request);
         if (ok) {
-            Log.info("watching sent: tid=" + tid + ", bid=" + bid);
+            Log.info("watching sent: rid=" + rid + ", bid=" + bid);
         } else {
-            Log.warning("watching not send: tid=" + tid + ", bid=" + bid);
+            Log.warning("watching not send: rid=" + rid + ", bid=" + bid);
         }
     }
     public void sendPlaying(History history) {
-        GameTableContent request = GameTableContent.play(history);
+        GameRoomContent request = GameRoomContent.play(history);
         boolean ok = sendGameContent(request);
         if (ok) {
             Log.info("playing sent");
@@ -166,10 +166,10 @@ public enum PlayerOne implements Delegate<StateMachine, StateTransition, PlayerS
         } else if (current.equals(PlayerState.WATCHING)) {
             // TODO: previous == PLAYING?
             // send request to the bot
-            Table watchTable = table;
+            Room watchRoom = room;
             Board watchBoard = board;
-            if (watchTable != null && watchBoard != null) {
-                sendWatching(watchTable.getTid(), watchBoard.getBid());
+            if (watchRoom != null && watchBoard != null) {
+                sendWatching(watchRoom.getRid(), watchBoard.getBid());
             }
         }
     }

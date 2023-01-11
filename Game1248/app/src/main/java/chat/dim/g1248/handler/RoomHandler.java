@@ -9,7 +9,7 @@ import chat.dim.g1248.NotificationNames;
 import chat.dim.g1248.PlayerOne;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
-import chat.dim.g1248.model.Table;
+import chat.dim.g1248.model.Room;
 import chat.dim.notification.NotificationCenter;
 import chat.dim.protocol.Content;
 import chat.dim.protocol.CustomizedContent;
@@ -17,11 +17,11 @@ import chat.dim.protocol.ID;
 import chat.dim.protocol.ReliableMessage;
 import chat.dim.utils.Log;
 
-public class TableHandler extends GameTableContentHandler {
+public class RoomHandler extends GameRoomContentHandler {
 
     private final SharedDatabase database;
 
-    public TableHandler(SharedDatabase db) {
+    public RoomHandler(SharedDatabase db) {
         super();
         database = db;
     }
@@ -37,45 +37,45 @@ public class TableHandler extends GameTableContentHandler {
     protected List<Content> handleWatchResponse(ID sender, CustomizedContent content, ReliableMessage rMsg) {
         Log.info("[GAME] received watch response: " + sender + ", " + content);
         // S -> C: "boards"
-        int tid;
+        int rid;
         Object integer;
-        integer = content.get("tid");
+        integer = content.get("rid");
         if (integer == null) {
-            throw new AssertionError("table id not found: " + content);
+            throw new AssertionError("room id not found: " + content);
         } else {
-            tid = ((Number) integer).intValue();
+            rid = ((Number) integer).intValue();
         }
 
         Object array = content.get("boards");
         if (array instanceof List) {
             PlayerOne theOne = PlayerOne.getInstance();
-            int myTid = theOne.getTid();
+            int myTid = theOne.getRid();
             int myBid = theOne.getBid();
             int myGid = theOne.getGid();
 
             List<Board> boards = Board.convertBoards((List<Object>) array);
             for (Board item : boards) {
-                if (tid == myTid && item.getBid() == myBid) {
+                if (rid == myTid && item.getBid() == myBid) {
                     Log.debug("this board is conflict, check player");
                     ID player = item.getPlayer();
                     if (player == null || theOne.equals(player) || myGid > 0) {
                         // this board is mine now
-                        Log.info("skip my board: tid=" + tid + ", " + item);
+                        Log.info("skip my board: rid=" + rid + ", " + item);
                         continue;
                     }
                     // this board has been occupied by other player, refresh it
                     Log.warning("this board is occupied by " + player);
                     theOne.board = item;
                 }
-                Log.info("update board: tid=" + tid + ", " + item);
+                Log.info("update board: rid=" + rid + ", " + item);
 
-                if (!database.updateBoard(tid, item)) {
-                    Log.error("failed to update board: tid=" + tid + ", " + item);
+                if (!database.updateBoard(rid, item)) {
+                    Log.error("failed to update board: rid=" + rid + ", " + item);
                     continue;
                 }
 
                 Map<String, Object> info = new HashMap<>();
-                info.put("tid", tid);
+                info.put("rid", rid);
                 info.put("bid", item.getBid());
                 info.put("board", item);
                 NotificationCenter nc = NotificationCenter.getInstance();
@@ -96,29 +96,29 @@ public class TableHandler extends GameTableContentHandler {
     protected List<Content> handlePlayResponse(ID sender, CustomizedContent content, ReliableMessage rMsg) {
         Log.info("[GAME] received play response: " + sender + ", " + content);
         // S -> C: "played"
-        int tid = (int) content.get("tid");
+        int rid = (int) content.get("rid");
         int bid = (int) content.get("bid");
         int gid = (int) content.get("gid");
         ID player = ID.parse(content.get("player"));
-        if (tid <= 0 || bid < 0 || gid <= 0 || player == null) {
+        if (rid <= 0 || bid < 0 || gid <= 0 || player == null) {
             Log.error("play response error: " + content);
             return null;
         }
 
         PlayerOne theOne = PlayerOne.getInstance();
-        Table table = theOne.table;
+        Room room = theOne.room;
         Board board = theOne.board;
-        if (table == null || board == null) {
+        if (room == null || board == null) {
             Log.error("not playing now");
-        } else if (table.getTid() != tid || board.getBid() != bid) {
+        } else if (room.getRid() != rid || board.getBid() != bid) {
             Log.error("play response not match: " + content);
         } else if (board.getGid() == 0) {
             Log.info("update current board: gid=" + gid + ", player=" + player);
             board.setGid(gid);
             board.setPlayer(player);
-            database.updateBoard(tid, board);
+            database.updateBoard(rid, board);
             HistoryCache hdb = (HistoryCache) database.historyDatabase;
-            hdb.updatePlayingHistory(tid, bid, gid, player);
+            hdb.updatePlayingHistory(rid, bid, gid, player);
         } else {
             // if player changed, means this seat is token away by another player
             board.setPlayer(player);

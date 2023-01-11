@@ -1,4 +1,4 @@
-package chat.dim.game1248.table;
+package chat.dim.game1248.room;
 
 import android.content.Context;
 import android.view.LayoutInflater;

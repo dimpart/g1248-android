@@ -1,4 +1,4 @@
-package chat.dim.game1248.table;
+package chat.dim.game1248.room;
 
 import androidx.lifecycle.ViewModelProviders;
 
@@ -32,21 +32,21 @@ import chat.dim.utils.Log;
 
 public class BoardFragment extends Fragment implements Observer {
 
-    TableViewModel mViewModel = null;
+    RoomViewModel mViewModel = null;
     private BoardAdapter adapter = null;
 
     private TextView scoreView = null;
     private GridView boardView = null;
 
-    int tableId;
+    int roomId;
     int boardId;
     int score;
     byte[] steps;
     final List<Integer> matrix = new ArrayList<>();
 
-    public BoardFragment(int tid, int bid) {
+    public BoardFragment(int rid, int bid) {
         super();
-        tableId = tid;
+        roomId = rid;
         boardId = bid;
         score = 0;
         steps = null;
@@ -66,7 +66,7 @@ public class BoardFragment extends Fragment implements Observer {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(TableViewModel.class);
+        mViewModel = ViewModelProviders.of(this).get(RoomViewModel.class);
         // TODO: Use the ViewModel
 
         // create adapter
@@ -77,8 +77,8 @@ public class BoardFragment extends Fragment implements Observer {
     }
 
     void loadBoard() {
-        Board board = mViewModel.getBoard(tableId, boardId);
-        assert board != null : "failed to get board: tid=" + tableId + ", bid=" + boardId;
+        Board board = mViewModel.getBoard(roomId, boardId);
+        assert board != null : "failed to get board: rid=" + roomId + ", bid=" + boardId;
         reloadBoard(board);
     }
 
@@ -125,9 +125,9 @@ public class BoardFragment extends Fragment implements Observer {
             // should not happen
             return;
         }
-        int tid = (int) info.get("tid");
+        int rid = (int) info.get("rid");
         int bid = (int) info.get("bid");
-        if (tid != tableId || bid != boardId) {
+        if (rid != roomId || bid != boardId) {
             // not mine
             return;
         }
@@ -140,7 +140,7 @@ public class BoardFragment extends Fragment implements Observer {
             return;
         }
 
-        Log.info("[GAME] refreshing tid: " + tid + ", bid: " + bid);
+        Log.info("[GAME] refreshing rid: " + rid + ", bid: " + bid);
         reloadBoard(board);
     }
 }

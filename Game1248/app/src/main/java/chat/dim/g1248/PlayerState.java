@@ -11,9 +11,9 @@ import chat.dim.network.SessionState;
  *  Defined for indicating player states
  *
  *      DEFAULT  - initialized
- *      SEEKING  - browsing tables in the hall
+ *      SEEKING  - browsing rooms in the hall
  *      WATCHING - watching another player playing the game
- *      PLAYING  - playing game in a table (with board)
+ *      PLAYING  - playing game in a room (with board)
  */
 public class PlayerState extends BaseState<StateMachine, StateTransition> {
 

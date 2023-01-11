@@ -31,7 +31,7 @@ public class HistoryCache implements HistoryDBI {
         }
     }
 
-    public boolean updatePlayingHistory(int tid, int bid, int gid, ID player) {
+    public boolean updatePlayingHistory(int rid, int bid, int gid, ID player) {
         // get playing history
         History history = historyCache.get(gid);
         if (history == null) {
@@ -39,16 +39,16 @@ public class HistoryCache implements HistoryDBI {
             history = historyCache.get(0);
             if (history == null) {
                 Log.error("no new history: gid=" + gid +
-                        ", tid=" + tid + ", bid=" + bid + ", player=" + player);
+                        ", rid=" + rid + ", bid=" + bid + ", player=" + player);
                 return false;
             }
             // move new history to its position: gid
             historyCache.remove(0);
         }
         Log.info("update history: gid=" + gid +
-                ", tid=" + tid + ", bid=" + bid + ", player=" + player + ", history=" + history);
+                ", rid=" + rid + ", bid=" + bid + ", player=" + player + ", history=" + history);
 
-        history.setTid(tid);
+        history.setRid(rid);
         history.setBid(bid);
         history.setGid(gid);
         history.setPlayer(player);

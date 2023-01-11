@@ -6,26 +6,26 @@ import java.util.List;
 
 import chat.dim.g1248.dbi.HallDBI;
 import chat.dim.g1248.model.Board;
+import chat.dim.g1248.model.Room;
 import chat.dim.g1248.model.Score;
-import chat.dim.g1248.model.Table;
 
 public class HallCache implements HallDBI {
 
-    // sorted tables
-    private final List<Table> cachedTables = new ArrayList<>();
+    // sorted rooms
+    private final List<Room> cachedRooms = new ArrayList<>();
 
-    private final Table placeholder = new Table();
+    private final Room placeholder = new Room();
 
     @Override
-    public Table getTable(int tid) {
-        if (tid == 0) {
+    public Room getRoom(int rid) {
+        if (rid == 0) {
             return placeholder;
         }
-        Iterator<Table> iterator = cachedTables.iterator();
-        Table item;
+        Iterator<Room> iterator = cachedRooms.iterator();
+        Room item;
         while (iterator.hasNext()) {
             item = iterator.next();
-            if (item.getTid() == tid) {
+            if (item.getRid() == rid) {
                 return item;
             }
         }
@@ -33,12 +33,12 @@ public class HallCache implements HallDBI {
     }
 
     @Override
-    public List<Table> getTables(int start, int end) {
-        List<Table> tables = new ArrayList<>();
-        int total = cachedTables.size();
+    public List<Room> getRooms(int start, int end) {
+        List<Room> rooms = new ArrayList<>();
+        int total = cachedRooms.size();
         if (total == 0) {
-            // place an empty table
-            tables.add(placeholder);
+            // place an empty room
+            rooms.add(placeholder);
         } else {
             if (end > total) {
                 // TODO: query
@@ -46,40 +46,40 @@ public class HallCache implements HallDBI {
                 end = total;
             }
             for (int index = start; index < end; ++index) {
-                tables.add(cachedTables.get(index));
+                rooms.add(cachedRooms.get(index));
             }
         }
-        return tables;
+        return rooms;
     }
 
     @Override
-    public boolean updateTable(int tid, List<Board> boards, Score best) {
-        // create table
-        Table table = new Table();
-        table.setTid(tid);
+    public boolean updateRoom(int rid, List<Board> boards, Score best) {
+        // create room
+        Room room = new Room();
+        room.setRid(rid);
         if (boards != null) {
-            table.setBoards(boards);
+            room.setBoards(boards);
         }
         if (best != null) {
-            table.setBest(best);
+            room.setBest(best);
         }
 
         // update cache
-        int total = cachedTables.size();
+        int total = cachedRooms.size();
         int index;
         int oid;
         for (index = 0; index < total; ++index) {
-            oid = cachedTables.get(index).getTid();
-            if (oid < tid) {
+            oid = cachedRooms.get(index).getRid();
+            if (oid < rid) {
                 continue;
-            } else if (oid == tid) {
+            } else if (oid == rid) {
                 // old record exists, remove it
-                cachedTables.remove(index);
+                cachedRooms.remove(index);
             }
-            // OK, place the new table here
+            // OK, place the new room here
             break;
         }
-        cachedTables.add(index, table);
+        cachedRooms.add(index, room);
         return true;
     }
 }

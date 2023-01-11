@@ -27,14 +27,14 @@ import chat.dim.protocol.ID;
  *  Transitions
  *  ~~~~~~~~~~~
  *
- *      0.1 - when local user ID set, change state to 'seeking' tables in the hall;
+ *      0.1 - when local user ID set, change state to 'seeking' rooms in the hall;
  *
- *      1.2 - when entered a table, change state to 'watching';
+ *      1.2 - when entered a room, change state to 'watching';
  *
- *      2.1 - when left the table (back to the hall), 'seeking' tables again;
+ *      2.1 - when left the room (back to the hall), 'seeking' rooms again;
  *      2.3 - when current board is available, change state to 'playing';
  *
- *      3.1 - when left the table (back to the hall), 'seeking' tables again;
+ *      3.1 - when left the room (back to the hall), 'seeking' rooms again;
  *      3.2 - when current board is occupied by another player, change state to 'watching'.
  */
 abstract class StateTransition extends BaseTransition<StateMachine> {
@@ -70,7 +70,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
             return new StateTransition(PlayerState.WATCHING) {
                 @Override
                 public boolean evaluate(StateMachine ctx) {
-                    return ctx.theOne.table != null;
+                    return ctx.theOne.room != null;
                 }
             };
         }
@@ -83,7 +83,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
             return new StateTransition(PlayerState.SEEKING) {
                 @Override
                 public boolean evaluate(StateMachine ctx) {
-                    return ctx.theOne.table == null;
+                    return ctx.theOne.room == null;
                 }
             };
         }
@@ -114,7 +114,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
             return new StateTransition(PlayerState.SEEKING) {
                 @Override
                 public boolean evaluate(StateMachine ctx) {
-                    return ctx.theOne.table == null;
+                    return ctx.theOne.room == null;
                 }
             };
         }

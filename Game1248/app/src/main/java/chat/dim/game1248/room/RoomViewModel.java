@@ -1,4 +1,4 @@
-package chat.dim.game1248.table;
+package chat.dim.game1248.room;
 
 import androidx.lifecycle.ViewModel;
 
@@ -9,16 +9,16 @@ import chat.dim.g1248.model.Stage;
 import chat.dim.g1248.model.Step;
 import chat.dim.utils.Log;
 
-public class TableViewModel extends ViewModel {
+public class RoomViewModel extends ViewModel {
 
-    Board getBoard(int tid, int bid) {
+    Board getBoard(int rid, int bid) {
 
         SharedDatabase database = SharedDatabase.getInstance();
 
-        return database.getBoard(tid, bid);
+        return database.getBoard(rid, bid);
     }
 
-    History getCurrentGameHistory(int tid, int bid, int gid) {
+    History getCurrentGameHistory(int rid, int bid, int gid) {
 
         SharedDatabase database = SharedDatabase.getInstance();
 
@@ -33,13 +33,13 @@ public class TableViewModel extends ViewModel {
             Step first = Step.first();
             Stage matrix = new Stage(Board.DEFAULT_SIZE);
             matrix.showNumber(first);
-            history = new History(tid, bid, Board.DEFAULT_SIZE);
+            history = new History(rid, bid, Board.DEFAULT_SIZE);
             history.addStep(first.getByte());
             history.setMatrix(matrix);
             database.saveHistory(history);
-        } else if (history.getTid() != tid || history.getBid() != bid) {
+        } else if (history.getRid() != rid || history.getBid() != bid) {
             // move to current board
-            history.setTid(tid);
+            history.setRid(rid);
             history.setBid(bid);
             database.saveHistory(history);
         }

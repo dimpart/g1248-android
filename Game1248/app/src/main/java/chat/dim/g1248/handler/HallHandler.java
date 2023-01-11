@@ -6,7 +6,7 @@ import java.util.Map;
 
 import chat.dim.g1248.NotificationNames;
 import chat.dim.g1248.SharedDatabase;
-import chat.dim.g1248.model.Table;
+import chat.dim.g1248.model.Room;
 import chat.dim.notification.NotificationCenter;
 import chat.dim.protocol.Content;
 import chat.dim.protocol.CustomizedContent;
@@ -33,22 +33,22 @@ public class HallHandler extends GameHallContentHandler {
     @Override
     protected List<Content> handleSeekResponse(ID sender, CustomizedContent content, ReliableMessage rMsg) {
         Log.info("[GAME] received seek response: " + sender + ", " + content);
-        // S -> C: "tables"
-        Object array = content.get("tables");
-        List<Table> tables;
+        // S -> C: "rooms"
+        Object array = content.get("rooms");
+        List<Room> rooms;
         if (array instanceof List) {
-            tables = Table.convertTables((List<Object>) array);
-            for (Table item : tables) {
-                database.updateTable(item.getTid(), item.getBoards(), item.getBest());
+            rooms = Room.convertRooms((List<Object>) array);
+            for (Room item : rooms) {
+                database.updateRoom(item.getRid(), item.getBoards(), item.getBest());
             }
         } else {
-            throw new AssertionError("cat not fetch tables: " + content);
+            throw new AssertionError("cat not fetch rooms: " + content);
         }
 
         Map<String, Object> info = new HashMap<>();
-        info.put("tables", tables);
+        info.put("rooms", rooms);
         NotificationCenter nc = NotificationCenter.getInstance();
-        nc.postNotification(NotificationNames.TablesUpdated, this, info);
+        nc.postNotification(NotificationNames.RoomsUpdated, this, info);
 
         // no need to respond this content
         return null;

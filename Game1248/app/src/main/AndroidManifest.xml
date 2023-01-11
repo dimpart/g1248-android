@@ -18,9 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".table.TableActivity"
+            android:name=".room.RoomActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_table"
+            android:label="@string/title_activity_room"
             android:theme="@style/FullscreenTheme"></activity>
         <activity
             android:name=".MainActivity"

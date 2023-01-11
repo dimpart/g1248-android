@@ -1,4 +1,4 @@
-package chat.dim.game1248.table;
+package chat.dim.game1248.room;
 
 import android.annotation.SuppressLint;
 
@@ -14,7 +14,7 @@ import android.view.View;
 
 import java.util.List;
 
-import chat.dim.cache.game.TableCache;
+import chat.dim.cache.game.RoomCache;
 import chat.dim.g1248.PlayerOne;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
@@ -26,7 +26,7 @@ import chat.dim.utils.Log;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class TableActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
+public class RoomActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -88,7 +88,7 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_table);
+        setContentView(R.layout.activity_room);
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
@@ -115,13 +115,13 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
 
             // get extra info
             Intent intent = getIntent();
-            int tid = intent.getIntExtra("tid", 0);
+            int rid = intent.getIntExtra("rid", 0);
             int bid = intent.getIntExtra("bid", -1);
             while (bid < 0) {
-                // get boards for this table
-                List<Board> boards = db.getBoards(tid);
+                // get boards for this room
+                List<Board> boards = db.getBoards(rid);
                 if (boards == null) {
-                    Log.error("no boards found: tid=" + tid);
+                    Log.error("no boards found: rid=" + rid);
                     bid = 0;
                     break;
                 }
@@ -146,25 +146,25 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
                     }
                 }
                 if (bid < 0) {
-                    Log.warning("no board available: tid=" + tid);
+                    Log.warning("no board available: rid=" + rid);
                     bid = 0;
                 }
             }
-            Log.info("[GAME] enter tid: " + tid + ", bid: " + bid);
+            Log.info("[GAME] enter rid: " + rid + ", bid: " + bid);
 
-            boardFragment = new MainBoardFragment(tid, bid);
+            boardFragment = new MainBoardFragment(rid, bid);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.main_board, boardFragment)
                     .commitNow();
-            boardsFragment1 = new BoardFragment(tid, (bid + 1) % TableCache.MAX_BOARDS_COUNT);
+            boardsFragment1 = new BoardFragment(rid, (bid + 1) % RoomCache.MAX_BOARDS_COUNT);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.board1, boardsFragment1)
                     .commitNow();
-            boardsFragment2 = new BoardFragment(tid, (bid + 2) % TableCache.MAX_BOARDS_COUNT);
+            boardsFragment2 = new BoardFragment(rid, (bid + 2) % RoomCache.MAX_BOARDS_COUNT);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.board2, boardsFragment2)
                     .commitNow();
-            boardsFragment3 = new BoardFragment(tid, (bid + 3) % TableCache.MAX_BOARDS_COUNT);
+            boardsFragment3 = new BoardFragment(rid, (bid + 3) % RoomCache.MAX_BOARDS_COUNT);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.board3, boardsFragment3)
                     .commitNow();
@@ -172,19 +172,19 @@ public class TableActivity extends AppCompatActivity implements GestureDetector.
             View trackPad = findViewById(R.id.trackpad);
             trackPad.setOnTouchListener(this::onTouch);
 
-            theOne.table = db.getTable(tid);
-            theOne.board = db.getBoard(tid, bid);
-            Log.info("playing table: " + theOne.table + ", board: " + theOne.board);
+            theOne.room = db.getRoom(rid);
+            theOne.board = db.getBoard(rid, bid);
+            Log.info("playing room: " + theOne.room + ", board: " + theOne.board);
         }
 
-        gestureDetector = new GestureDetector(TableActivity.this, this);
+        gestureDetector = new GestureDetector(RoomActivity.this, this);
     }
 
     @Override
     protected void onDestroy() {
 
         PlayerOne theOne = PlayerOne.getInstance();
-        theOne.table = null;
+        theOne.room = null;
         theOne.board = null;
 
         super.onDestroy();

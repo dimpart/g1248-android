@@ -39,7 +39,7 @@ import chat.dim.format.DataCoder;
 import chat.dim.g1248.Client;
 import chat.dim.g1248.GlobalVariable;
 import chat.dim.g1248.PlayerOne;
-import chat.dim.game1248.hall.TablesFragment;
+import chat.dim.game1248.hall.RoomsFragment;
 import chat.dim.http.HTTPClient;
 import chat.dim.io.Permissions;
 import chat.dim.mkm.User;
@@ -52,7 +52,7 @@ import chat.dim.utils.Log;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private TablesFragment tablesFragment = null;
+    private RoomsFragment roomsFragment = null;
 
     public MainActivity() {
         super();
@@ -82,9 +82,9 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
-            tablesFragment = TablesFragment.newInstance();
+            roomsFragment = RoomsFragment.newInstance();
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, tablesFragment)
+                    .replace(R.id.container, roomsFragment)
                     .commitNow();
         }
 

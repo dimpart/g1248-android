@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import chat.dim.g1248.NotificationNames;
-import chat.dim.g1248.model.Table;
+import chat.dim.g1248.model.Room;
 import chat.dim.game1248.R;
 import chat.dim.notification.Notification;
 import chat.dim.notification.NotificationCenter;
@@ -24,17 +24,17 @@ import chat.dim.notification.Observer;
 import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
 
-public class TablesFragment extends Fragment implements Observer {
+public class RoomsFragment extends Fragment implements Observer {
 
     private HallViewModel mViewModel = null;
-    private TablesAdapter adapter = null;
+    private RoomsAdapter adapter = null;
 
-    private GridView tablesView = null;
+    private GridView roomsView = null;
 
-    private final List<Table> tables = new ArrayList<>();
+    private final List<Room> rooms = new ArrayList<>();
 
-    public static TablesFragment newInstance() {
-        return new TablesFragment();
+    public static RoomsFragment newInstance() {
+        return new RoomsFragment();
     }
 
     @Nullable
@@ -43,7 +43,7 @@ public class TablesFragment extends Fragment implements Observer {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_main, container, false);
 
-        tablesView = view.findViewById(R.id.tables_view);
+        roomsView = view.findViewById(R.id.rooms_view);
 
         return view;
     }
@@ -57,16 +57,16 @@ public class TablesFragment extends Fragment implements Observer {
         //mViewModel.checkMembers();
 
         // create adapter
-        adapter = new TablesAdapter(getContext(), R.layout.griditem_tables, tables);
-        tablesView.setAdapter(adapter);
+        adapter = new RoomsAdapter(getContext(), R.layout.griditem_rooms, rooms);
+        roomsView.setAdapter(adapter);
         // load data in background
-        BackgroundThreads.wait(this::reloadTables);
+        BackgroundThreads.wait(this::reloadRooms);
     }
 
-    public void reloadTables() {
-        List<Table> newTables = mViewModel.getTables(0, 20);
-        tables.clear();
-        tables.addAll(newTables);
+    public void reloadRooms() {
+        List<Room> newRooms = mViewModel.getRooms(0, 20);
+        rooms.clear();
+        rooms.addAll(newRooms);
 
         MainThread.call(this::onReload);
     }
@@ -78,13 +78,13 @@ public class TablesFragment extends Fragment implements Observer {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         NotificationCenter nc = NotificationCenter.getInstance();
-        nc.addObserver(this, NotificationNames.TablesUpdated);
+        nc.addObserver(this, NotificationNames.RoomsUpdated);
     }
 
     @Override
     public void onDestroy() {
         NotificationCenter nc = NotificationCenter.getInstance();
-        nc.removeObserver(this, NotificationNames.TablesUpdated);
+        nc.removeObserver(this, NotificationNames.RoomsUpdated);
         super.onDestroy();
     }
 
@@ -93,10 +93,10 @@ public class TablesFragment extends Fragment implements Observer {
         String name = notification.name;
         Map info = notification.userInfo;
         assert name != null && info != null : "notification error: " + notification;
-        if (!name.equals(NotificationNames.TablesUpdated)) {
+        if (!name.equals(NotificationNames.RoomsUpdated)) {
             // should not happen
             return;
         }
-        reloadTables();
+        reloadRooms();
     }
 }

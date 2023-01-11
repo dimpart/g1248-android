@@ -1,4 +1,4 @@
-package chat.dim.game1248.table;
+package chat.dim.game1248.room;
 
 import java.util.List;
 import java.util.Map;
@@ -9,10 +9,10 @@ import chat.dim.g1248.PlayerState;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.History;
+import chat.dim.g1248.model.Room;
 import chat.dim.g1248.model.Square;
 import chat.dim.g1248.model.Stage;
 import chat.dim.g1248.model.Step;
-import chat.dim.g1248.model.Table;
 import chat.dim.notification.Notification;
 import chat.dim.protocol.ID;
 import chat.dim.threading.BackgroundThreads;
@@ -21,8 +21,8 @@ import chat.dim.utils.Log;
 
 public class MainBoardFragment extends BoardFragment {
 
-    public MainBoardFragment(int tid, int bid) {
-        super(tid, bid);
+    public MainBoardFragment(int rid, int bid) {
+        super(rid, bid);
     }
 
     @Override
@@ -34,9 +34,9 @@ public class MainBoardFragment extends BoardFragment {
             // should not happen
             return;
         }
-        int tid = (int) info.get("tid");
+        int rid = (int) info.get("rid");
         int bid = (int) info.get("bid");
-        if (tid != tableId || bid != boardId) {
+        if (rid != roomId || bid != boardId) {
             // not mine
             return;
         }
@@ -47,18 +47,18 @@ public class MainBoardFragment extends BoardFragment {
             return;
         }
 
-        Log.info("[GAME] refreshing tid: " + tid + ", bid: " + bid);
+        Log.info("[GAME] refreshing rid: " + rid + ", bid: " + bid);
         reloadBoard(board);
     }
 
     @Override
     void loadBoard() {
         PlayerOne theOne = PlayerOne.getInstance();
-        Table table = theOne.table;
+        Room room = theOne.room;
         Board board = theOne.board;
-        assert table != null && board != null : "player one error: " + table + ", " + board;
+        assert room != null && board != null : "player one error: " + room + ", " + board;
         if (!(board instanceof History)) {
-            History history = mViewModel.getCurrentGameHistory(tableId, boardId, board.getGid());
+            History history = mViewModel.getCurrentGameHistory(roomId, boardId, board.getGid());
             if (history != null) {
                 board = history;
                 theOne.board = history;
@@ -93,7 +93,7 @@ public class MainBoardFragment extends BoardFragment {
 
         // 1. check player on the game board
         Board board = theOne.board;
-        assert board != null : "failed to get board: tid=" + tableId + ", bid=" + boardId;
+        assert board != null : "failed to get board: rid=" + roomId + ", bid=" + boardId;
         ID player = board.getPlayer();
         if (player != null && !theOne.equals(player)) {
             Log.error("this seat is occupied");
@@ -102,7 +102,7 @@ public class MainBoardFragment extends BoardFragment {
 
         // 2. get game history with gid on the board
         int gid = board.getGid();
-        History history = mViewModel.getCurrentGameHistory(tableId, boardId, gid);
+        History history = mViewModel.getCurrentGameHistory(roomId, boardId, gid);
         if (history == null) {
             Log.error("history not found, fetching gid: " + gid);
             theOne.sendFetching(gid);

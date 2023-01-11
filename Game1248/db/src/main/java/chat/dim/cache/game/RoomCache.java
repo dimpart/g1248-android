@@ -9,20 +9,20 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import chat.dim.g1248.dbi.TableDBI;
+import chat.dim.g1248.dbi.RoomDBI;
 import chat.dim.g1248.model.Board;
 import chat.dim.utils.Log;
 
-public class TableCache implements TableDBI {
+public class RoomCache implements RoomDBI {
 
     public static final int MAX_BOARDS_COUNT = 4;
 
-    // tid => sorted boards
+    // rid => sorted boards
     private final SparseArray<List<Board>> cachedBoards = new SparseArray<>();
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    private static void fillBoards(int tid, List<Board> boards) {
+    private static void fillBoards(int rid, List<Board> boards) {
         int index;
         boolean exists;
         for (index = 0; index < MAX_BOARDS_COUNT && boards.size() < MAX_BOARDS_COUNT; ++index) {
@@ -34,14 +34,14 @@ public class TableCache implements TableDBI {
                 }
             }
             if (!exists) {
-                boards.add(index, new Board(tid, index, Board.DEFAULT_SIZE));
+                boards.add(index, new Board(rid, index, Board.DEFAULT_SIZE));
             }
         }
     }
 
     @Override
-    public List<Board> getBoards(int tid) {
-        List<Board> boards = cachedBoards.get(tid);
+    public List<Board> getBoards(int rid) {
+        List<Board> boards = cachedBoards.get(rid);
         if (boards == null || boards.size() < MAX_BOARDS_COUNT) {
             // lock to fill
             Lock writeLock = lock.writeLock();
@@ -49,9 +49,9 @@ public class TableCache implements TableDBI {
             try {
                 if (boards == null) {
                     boards = new ArrayList<>();
-                    cachedBoards.put(tid, boards);
+                    cachedBoards.put(rid, boards);
                 }
-                fillBoards(tid, boards);
+                fillBoards(rid, boards);
             } finally {
                 writeLock.unlock();
             }
@@ -61,30 +61,30 @@ public class TableCache implements TableDBI {
     }
 
     @Override
-    public Board getBoard(int tid, int bid) {
-        List<Board> boards = getBoards(tid);
+    public Board getBoard(int rid, int bid) {
+        List<Board> boards = getBoards(rid);
         //assert boards.size() == MAX_BOARDS_COUNT : "boards error: " + boards;
         Iterator<Board> iterator = boards.iterator();
         Board item;
         while (iterator.hasNext()) {
             item = iterator.next();
-            if (/*item.getTid() == tid && */item.getBid() == bid) {
+            if (/*item.getRid() == rid && */item.getBid() == bid) {
                 return item;
             }
         }
-        throw new IndexOutOfBoundsException("failed to get board: tid=" + tid + ", bid=" + bid);
+        throw new IndexOutOfBoundsException("failed to get board: rid=" + rid + ", bid=" + bid);
     }
 
     @Override
-    public boolean updateBoard(int tid, Board board) {
+    public boolean updateBoard(int rid, Board board) {
         if (board.getGid() <= 0) {
-            Log.error("board error: tid=" + tid + ", " + board);
+            Log.error("board error: rid=" + rid + ", " + board);
             return false;
         }
-        List<Board> array = getBoards(tid);
+        List<Board> array = getBoards(rid);
         int bid = board.getBid();
         if (bid < 0 || bid >= array.size()) {
-            Log.error("board error: tid=" + tid + ", " + board);
+            Log.error("board error: rid=" + rid + ", " + board);
             return false;
         }
         Board old = array.get(bid);

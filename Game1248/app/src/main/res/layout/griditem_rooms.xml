@@ -10,7 +10,7 @@
         android:layout_height="128dp" >
 
         <ImageView
-            android:id="@+id/table_image_view"
+            android:id="@+id/room_image_view"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="center"

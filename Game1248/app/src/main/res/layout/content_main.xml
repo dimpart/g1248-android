@@ -9,7 +9,7 @@
     tools:showIn="@layout/app_bar_main">
 
     <GridView
-        android:id="@+id/tables_view"
+        android:id="@+id/rooms_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:columnWidth="128dp"
@@ -18,5 +18,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/griditem_tables" />
+        tools:listitem="@layout/griditem_rooms" />
 </androidx.constraintlayout.widget.ConstraintLayout>

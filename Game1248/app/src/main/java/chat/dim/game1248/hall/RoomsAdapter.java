@@ -12,36 +12,36 @@ import androidx.cardview.widget.CardView;
 
 import java.util.List;
 
-import chat.dim.g1248.model.Table;
+import chat.dim.g1248.model.Room;
 import chat.dim.game1248.R;
-import chat.dim.game1248.table.TableActivity;
+import chat.dim.game1248.room.RoomActivity;
 
-public class TablesAdapter extends ArrayAdapter<Table> {
+public class RoomsAdapter extends ArrayAdapter<Room> {
 
     private final int resId;
 
-//    public TablesAdapter(Context context, int resource) {
+//    public RoomsAdapter(Context context, int resource) {
 //        super(context, resource);
 //    }
 //
-//    public TablesAdapter(Context context, int resource, int textViewResourceId) {
+//    public RoomsAdapter(Context context, int resource, int textViewResourceId) {
 //        super(context, resource, textViewResourceId);
 //    }
 
-    TablesAdapter(Context context, int resource, List<Table> objects) {
+    RoomsAdapter(Context context, int resource, List<Room> objects) {
         super(context, resource, objects);
         resId = resource;
     }
 
-//    public TablesAdapter(Context context, int resource, int textViewResourceId, Table[] objects) {
+//    public RoomsAdapter(Context context, int resource, int textViewResourceId, Room[] objects) {
 //        super(context, resource, textViewResourceId, objects);
 //    }
 //
-//    public TablesAdapter(Context context, int resource, List<Table> objects) {
+//    public RoomsAdapter(Context context, int resource, List<Room> objects) {
 //        super(context, resource, objects);
 //    }
 //
-//    public TablesAdapter(Context context, int resource, int textViewResourceId, List<Table> objects) {
+//    public RoomsAdapter(Context context, int resource, int textViewResourceId, List<Room> objects) {
 //        super(context, resource, textViewResourceId, objects);
 //    }
 
@@ -54,7 +54,7 @@ public class TablesAdapter extends ArrayAdapter<Table> {
             view = LayoutInflater.from(getContext()).inflate(resId, null);
             viewHolder = new ViewHolder();
             viewHolder.cardView = view.findViewById(R.id.card_view);
-            viewHolder.tableImageView = view.findViewById(R.id.table_image_view);
+            viewHolder.roomImageView = view.findViewById(R.id.room_image_view);
             view.setTag(viewHolder);
         } else {
             view = convertView;
@@ -62,8 +62,8 @@ public class TablesAdapter extends ArrayAdapter<Table> {
         }
 
 
-        Table table = getItem(position);
-        viewHolder.showTable(table);
+        Room room = getItem(position);
+        viewHolder.showRoom(room);
 
         return view;
     }
@@ -72,9 +72,9 @@ public class TablesAdapter extends ArrayAdapter<Table> {
 
         CardView cardView = null;
 
-        ImageView tableImageView = null;
+        ImageView roomImageView = null;
 
-        private Table table = null;
+        private Room room = null;
 
         ViewHolder() {
         }
@@ -84,19 +84,19 @@ public class TablesAdapter extends ArrayAdapter<Table> {
             super.finalize();
         }
 
-        private void showTable(Table table) {
-            this.table = table;
+        private void showRoom(Room room) {
+            this.room = room;
 
-            tableImageView.setOnClickListener(view -> clickTable());
+            roomImageView.setOnClickListener(view -> clickRoom());
         }
 
-        private void clickTable() {
-            int tid = table.getTid();
+        private void clickRoom() {
+            int rid = room.getRid();
 
             Context content = getContext();
             Intent intent = new Intent();
-            intent.setClass(content, TableActivity.class);
-            intent.putExtra("tid", tid);
+            intent.setClass(content, RoomActivity.class);
+            intent.putExtra("rid", rid);
             content.startActivity(intent);
         }
     }

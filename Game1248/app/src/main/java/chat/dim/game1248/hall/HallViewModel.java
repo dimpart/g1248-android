@@ -6,19 +6,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chat.dim.g1248.SharedDatabase;
-import chat.dim.g1248.model.Table;
+import chat.dim.g1248.model.Room;
 
 public class HallViewModel extends ViewModel {
 
-    public List<Table> getTables(int start, int end) {
+    public List<Room> getRooms(int start, int end) {
 
         SharedDatabase database = SharedDatabase.getInstance();
 
-        List<Table> tables = database.getTables(start, end);
-        if (tables == null) {
+        List<Room> rooms = database.getRooms(start, end);
+        if (rooms == null) {
             return new ArrayList<>();
         } else {
-            return tables;
+            return rooms;
         }
     }
 }
