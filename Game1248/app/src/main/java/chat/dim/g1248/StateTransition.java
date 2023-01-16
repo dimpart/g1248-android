@@ -56,7 +56,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
         StateTransition getDefaultSeekingTransition() {
             return new StateTransition(PlayerState.SEEKING) {
                 @Override
-                public boolean evaluate(StateMachine ctx) {
+                public boolean evaluate(StateMachine ctx, long now, long elapsed) {
                     return ctx.theOne.user != null;
                 }
             };
@@ -69,7 +69,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
         StateTransition getSeekingWatchingTransition() {
             return new StateTransition(PlayerState.WATCHING) {
                 @Override
-                public boolean evaluate(StateMachine ctx) {
+                public boolean evaluate(StateMachine ctx, long now, long elapsed) {
                     return ctx.theOne.room != null;
                 }
             };
@@ -82,7 +82,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
         StateTransition getWatchingSeekingTransition() {
             return new StateTransition(PlayerState.SEEKING) {
                 @Override
-                public boolean evaluate(StateMachine ctx) {
+                public boolean evaluate(StateMachine ctx, long now, long elapsed) {
                     return ctx.theOne.room == null;
                 }
             };
@@ -95,7 +95,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
         StateTransition getWatchingPlayingTransition() {
             return new StateTransition(PlayerState.PLAYING) {
                 @Override
-                public boolean evaluate(StateMachine ctx) {
+                public boolean evaluate(StateMachine ctx, long now, long elapsed) {
                     Board board = ctx.theOne.board;
                     if (board == null) {
                         return false;
@@ -113,7 +113,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
         StateTransition getPlayingSeekingTransition() {
             return new StateTransition(PlayerState.SEEKING) {
                 @Override
-                public boolean evaluate(StateMachine ctx) {
+                public boolean evaluate(StateMachine ctx, long now, long elapsed) {
                     return ctx.theOne.room == null;
                 }
             };
@@ -126,7 +126,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
         StateTransition getPlayingWatchingTransition() {
             return new StateTransition(PlayerState.WATCHING) {
                 @Override
-                public boolean evaluate(StateMachine ctx) {
+                public boolean evaluate(StateMachine ctx, long now, long elapsed) {
                     Board board = ctx.theOne.board;
                     if (board == null) {
                         return true;

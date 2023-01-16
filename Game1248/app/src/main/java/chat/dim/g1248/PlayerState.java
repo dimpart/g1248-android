@@ -51,12 +51,14 @@ public class PlayerState extends BaseState<StateMachine, StateTransition> {
     }
 
     @Override
-    public void onEnter(State<StateMachine, StateTransition> previous, StateMachine ctx) {
+    public void onEnter(State<StateMachine, StateTransition> previous,
+                        StateMachine machine, long now, long elapsed) {
 
     }
 
     @Override
-    public void onExit(State<StateMachine, StateTransition> next, StateMachine ctx) {
+    public void onExit(State<StateMachine, StateTransition> next,
+                       StateMachine machine, long now, long elapsed) {
 
     }
 
