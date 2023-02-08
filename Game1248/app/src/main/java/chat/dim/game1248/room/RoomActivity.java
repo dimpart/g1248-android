@@ -3,7 +3,6 @@ package chat.dim.game1248.room;
 import android.annotation.SuppressLint;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
@@ -23,13 +22,14 @@ import chat.dim.g1248.model.Room;
 import chat.dim.g1248.model.Step;
 import chat.dim.game1248.R;
 import chat.dim.game1248.chat.ChatFragment;
+import chat.dim.ui.TitledActivity;
 import chat.dim.utils.Log;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class RoomActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
+public class RoomActivity extends TitledActivity implements GestureDetector.OnGestureListener {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -154,6 +154,8 @@ public class RoomActivity extends AppCompatActivity implements GestureDetector.O
                 }
             }
             Log.info("[GAME] enter rid: " + rid + ", bid: " + bid);
+
+            setOriginTitle("Room #" + rid);
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 

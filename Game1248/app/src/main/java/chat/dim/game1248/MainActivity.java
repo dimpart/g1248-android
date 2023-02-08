@@ -18,7 +18,6 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
@@ -47,10 +46,11 @@ import chat.dim.protocol.ID;
 import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
 import chat.dim.type.Triplet;
+import chat.dim.ui.TitledActivity;
 import chat.dim.utils.Log;
 import chat.dim.utils.Nickname;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends TitledActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private RoomsFragment roomsFragment = null;

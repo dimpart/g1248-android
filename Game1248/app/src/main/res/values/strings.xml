@@ -31,4 +31,12 @@
     <string name="num_8192">8192</string>
     <string name="num_16384">16384</string>
     <string name="num_32768">32768</string>
+
+    <string name="chat_hint">Input text message here...</string>
+
+    <string name="server_connecting">Connecting</string>
+    <string name="server_connected">Connected</string>
+    <string name="server_handshaking">Handshaking</string>
+    <string name="server_error">Network Error</string>
+    <string name="server_default">Waiting</string>
 </resources>

@@ -10,21 +10,19 @@
     <TextView
         android:id="@+id/chat_history"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="history" />
+        android:layout_height="wrap_content" />
 
     <EditText
         android:id="@+id/chat_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:autofillHints=""
-        android:background="@color/black_overlay"
+        android:background="@android:color/background_light"
         android:ems="10"
-        android:hint="Input text message here..."
+        android:hint="@string/chat_hint"
         android:imeOptions="actionSend"
         android:inputType="textPersonName"
         android:visibility="gone"
-        tools:targetApi="o"
-        tools:text="input message" />
+        tools:targetApi="o" />
 
 </LinearLayout>

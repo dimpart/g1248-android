@@ -32,7 +32,7 @@ public class ChatViewModel extends ViewModel {
             Log.error("message error: " + content + ", " + iMsg);
         } else {
             messages.add(new Pair<>(iMsg.getEnvelope(), content));
-            if (messages.size() > 3) {
+            if (messages.size() > MAX_HISTORY_COUNT) {
                 messages.remove(0);
             }
         }

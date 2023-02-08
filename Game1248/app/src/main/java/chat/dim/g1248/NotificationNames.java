@@ -2,6 +2,8 @@ package chat.dim.g1248;
 
 public class NotificationNames {
 
+    public static final String ServerStateChanged = "ServerStateChanged";
+
     public static final String RoomsUpdated = "RoomsUpdated";
 
     public static final String GameBoardUpdated = "GameBoardUpdated";

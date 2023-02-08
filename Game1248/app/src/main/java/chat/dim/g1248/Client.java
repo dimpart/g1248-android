@@ -74,12 +74,16 @@ public class Client extends Terminal {
         SessionState current = ctx.getCurrentState();
         if (current == null) {
             return;
-        }
-        if (current.equals(SessionState.RUNNING)) {
+        } else if (current.equals(SessionState.RUNNING)) {
             // request rooms for hall view
             PlayerOne theOne = PlayerOne.getInstance();
             theOne.sendSeeking(0, 20);
         }
+
+        Map<String, Object> info = new HashMap<>();
+        info.put("state", current.name);
+        NotificationCenter nc = NotificationCenter.getInstance();
+        nc.postNotification(NotificationNames.ServerStateChanged, this, info);
     }
 
     @Override
