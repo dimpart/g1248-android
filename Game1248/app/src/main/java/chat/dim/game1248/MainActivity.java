@@ -48,6 +48,7 @@ import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
 import chat.dim.type.Triplet;
 import chat.dim.utils.Log;
+import chat.dim.utils.Nickname;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -108,6 +109,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private static String genNickname() {
+        Nickname nickname = Nickname.getInstance();
+        return nickname.english();
+    }
+
     private void launch() {
         if (!Permissions.canWriteExternalStorage(this)) {
             Permissions.requestExternalStoragePermissions(this);
@@ -123,7 +129,7 @@ public class MainActivity extends AppCompatActivity
             User user = facebook.getCurrentUser();
             if (user == null) {
                 Register register = new Register(shared.adb);
-                ID uid = register.createUser("Player ONE", null);
+                ID uid = register.createUser(genNickname(), null);
                 user = facebook.getUser(uid);
                 facebook.setCurrentUser(user);
                 List<ID> localUsers = new ArrayList<>();
@@ -136,6 +142,11 @@ public class MainActivity extends AppCompatActivity
             String uid = user.getIdentifier().toString();
             MainThread.call(() -> {
                 TextView textView = findViewById(R.id.nav_user_id);
+                if (textView == null) {
+                    // FIXME: nav_user_id not found?
+                    Log.error("nav_user_id not found");
+                    return;
+                }
                 textView.setText(uid);
             });
             // get the nearest neighbor station

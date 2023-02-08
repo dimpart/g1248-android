@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,8 +19,10 @@ import chat.dim.cache.game.RoomCache;
 import chat.dim.g1248.PlayerOne;
 import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
+import chat.dim.g1248.model.Room;
 import chat.dim.g1248.model.Step;
 import chat.dim.game1248.R;
+import chat.dim.game1248.chat.ChatFragment;
 import chat.dim.utils.Log;
 
 /**
@@ -106,7 +109,7 @@ public class RoomActivity extends AppCompatActivity implements GestureDetector.O
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+//        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 
         if (savedInstanceState == null) {
 
@@ -152,22 +155,24 @@ public class RoomActivity extends AppCompatActivity implements GestureDetector.O
             }
             Log.info("[GAME] enter rid: " + rid + ", bid: " + bid);
 
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            chatFragment = new ChatFragment(rid);
+            transaction.replace(R.id.chat_panel, chatFragment);
+
             boardFragment = new MainBoardFragment(rid, bid);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_board, boardFragment)
-                    .commitNow();
+            transaction.replace(R.id.main_board, boardFragment);
+
             boardsFragment1 = new BoardFragment(rid, (bid + 1) % RoomCache.MAX_BOARDS_COUNT);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.board1, boardsFragment1)
-                    .commitNow();
+            transaction.replace(R.id.board1, boardsFragment1);
+
             boardsFragment2 = new BoardFragment(rid, (bid + 2) % RoomCache.MAX_BOARDS_COUNT);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.board2, boardsFragment2)
-                    .commitNow();
+            transaction.replace(R.id.board2, boardsFragment2);
+
             boardsFragment3 = new BoardFragment(rid, (bid + 3) % RoomCache.MAX_BOARDS_COUNT);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.board3, boardsFragment3)
-                    .commitNow();
+            transaction.replace(R.id.board3, boardsFragment3);
+
+            transaction.commitNow();
 
             View trackPad = findViewById(R.id.trackpad);
             trackPad.setOnTouchListener(this::onTouch);
@@ -175,6 +180,13 @@ public class RoomActivity extends AppCompatActivity implements GestureDetector.O
             theOne.room = db.getRoom(rid);
             theOne.board = db.getBoard(rid, bid);
             Log.info("playing room: " + theOne.room + ", board: " + theOne.board);
+
+            boolean ok = theOne.joinRoom(rid);
+            if (ok) {
+                Log.info("enter chat room: " + rid);
+                String text = "I'm coming";
+                theOne.sendText(text, rid);
+            }
         }
 
         gestureDetector = new GestureDetector(RoomActivity.this, this);
@@ -184,12 +196,26 @@ public class RoomActivity extends AppCompatActivity implements GestureDetector.O
     protected void onDestroy() {
 
         PlayerOne theOne = PlayerOne.getInstance();
+
+        Room room = theOne.room;
+        if (room != null) {
+            int rid = room.getRid();
+            String text = "Goodbye!";
+            theOne.sendText(text, rid);
+            boolean ok = theOne.quitRoom(rid);
+            if (ok) {
+                Log.info("exit chat room: " + rid);
+            }
+        }
+
         theOne.room = null;
         theOne.board = null;
 
         super.onDestroy();
     }
 
+
+    private ChatFragment chatFragment = null;
 
     private MainBoardFragment boardFragment = null;
     private BoardFragment boardsFragment1 = null;
