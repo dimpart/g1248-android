@@ -20,6 +20,7 @@ import chat.dim.g1248.SharedDatabase;
 import chat.dim.g1248.model.Board;
 import chat.dim.g1248.model.Room;
 import chat.dim.g1248.model.Step;
+import chat.dim.game1248.GameApp;
 import chat.dim.game1248.R;
 import chat.dim.game1248.chat.ChatFragment;
 import chat.dim.ui.TitledActivity;
@@ -280,6 +281,8 @@ public class RoomActivity extends TitledActivity implements GestureDetector.OnGe
     }
 
     private boolean onTouch(View view, MotionEvent motionEvent) {
+        GameApp.getInstance().hideKeyboard(view);
+        // gesture for swipe
         if (gestureDetector.onTouchEvent(motionEvent)) {
             return true;
         }

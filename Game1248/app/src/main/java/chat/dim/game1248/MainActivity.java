@@ -6,7 +6,6 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import android.os.Environment;
 import android.view.View;
 
 import androidx.core.view.GravityCompat;
@@ -24,31 +23,17 @@ import android.view.Menu;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 
-import chat.dim.CommonFacebook;
-import chat.dim.Config;
-import chat.dim.Register;
-import chat.dim.format.Base64;
-import chat.dim.format.DataCoder;
 import chat.dim.g1248.Client;
-import chat.dim.g1248.GlobalVariable;
-import chat.dim.g1248.PlayerOne;
 import chat.dim.game1248.hall.RoomsFragment;
-import chat.dim.http.HTTPClient;
 import chat.dim.io.Permissions;
 import chat.dim.mkm.User;
-import chat.dim.protocol.ID;
 import chat.dim.threading.BackgroundThreads;
 import chat.dim.threading.MainThread;
-import chat.dim.type.Triplet;
 import chat.dim.ui.TitledActivity;
 import chat.dim.utils.Log;
-import chat.dim.utils.Nickname;
 
 public class MainActivity extends TitledActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -102,68 +87,31 @@ public class MainActivity extends TitledActivity
                 sb.append("\n");
             }
             Client.prepare(sb.toString(), this);
-            // launch client
-            launch();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-    private static String genNickname() {
-        Nickname nickname = Nickname.getInstance();
-        return nickname.english();
-    }
-
-    private void launch() {
-        if (!Permissions.canWriteExternalStorage(this)) {
+        // launch client
+        if (Permissions.canWriteExternalStorage(this)) {
+            BackgroundThreads.rush(() -> {
+                GameApp app = GameApp.getInstance();
+                User user = app.prepareLocalUser();
+                // show user ID
+                String uid = user.getIdentifier().toString();
+                MainThread.call(() -> {
+                    TextView textView = findViewById(R.id.nav_user_id);
+                    if (textView == null) {
+                        // FIXME: nav_user_id not found?
+                        Log.error("nav_user_id not found");
+                        return;
+                    }
+                    textView.setText(uid);
+                });
+            });
+        } else {
             Permissions.requestExternalStoragePermissions(this);
             Log.warning("Requesting external storage permissions");
-            return;
         }
-        BackgroundThreads.rush(() -> {
-            GlobalVariable shared = GlobalVariable.getInstance();
-            CommonFacebook facebook = shared.facebook;
-            Config config = shared.config;
-            Client client = (Client) shared.terminal;
-            // check local user
-            User user = facebook.getCurrentUser();
-            if (user == null) {
-                Register register = new Register(shared.adb);
-                ID uid = register.createUser(genNickname(), null);
-                user = facebook.getUser(uid);
-                facebook.setCurrentUser(user);
-                List<ID> localUsers = new ArrayList<>();
-                localUsers.add(uid);
-                shared.adb.saveLocalUsers(localUsers);
-            }
-            PlayerOne theOne = PlayerOne.getInstance();
-            theOne.user = user;
-            // show user ID
-            String uid = user.getIdentifier().toString();
-            MainThread.call(() -> {
-                TextView textView = findViewById(R.id.nav_user_id);
-                if (textView == null) {
-                    // FIXME: nav_user_id not found?
-                    Log.error("nav_user_id not found");
-                    return;
-                }
-                textView.setText(uid);
-            });
-            // get the nearest neighbor station
-            String host;
-            int port;
-            Triplet<String, Integer, ID> neighbor = client.getNeighborStation();
-            if (neighbor != null) {
-                host = neighbor.first;
-                port = neighbor.second;
-            } else {
-                host = config.getStationHost();
-                port = config.getStationPort();
-            }
-            // connect to the station
-            Log.info("[GAME] user " + user + " login (" + host + ":" + port + ") ...");
-            client.connect(host, port);
-        });
     }
 
     @Override
@@ -221,33 +169,5 @@ public class MainActivity extends TitledActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    static {
-
-        Log.LEVEL = Log.DEVELOP;
-
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        path += File.separator + "chat.dim.game1248";
-
-        HTTPClient http = HTTPClient.getInstance();
-        http.setRoot(path);
-
-        // prepare plugins
-        GlobalVariable shared = GlobalVariable.getInstance();
-        assert shared != null;
-
-        // android.Base64
-        Base64.coder = new DataCoder() {
-            @Override
-            public String encode(byte[] data) {
-                return android.util.Base64.encodeToString(data, android.util.Base64.DEFAULT);
-            }
-
-            @Override
-            public byte[] decode(String string) {
-                return android.util.Base64.decode(string, android.util.Base64.DEFAULT);
-            }
-        };
     }
 }
