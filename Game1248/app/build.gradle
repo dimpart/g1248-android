@@ -29,7 +29,7 @@ dependencies {
     implementation project(':db')
 
     implementation group: 'chat.dim.game', name: 'G1248', version: '0.0.1'
-    implementation group: 'chat.dim', name: 'LNC', version: '0.1.0'
+    implementation group: 'chat.dim', name: 'LNC', version: '0.1.1'
 
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.0.0'

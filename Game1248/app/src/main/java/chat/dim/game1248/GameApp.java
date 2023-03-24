@@ -11,12 +11,12 @@ import chat.dim.CommonFacebook;
 import chat.dim.Config;
 import chat.dim.Register;
 import chat.dim.Terminal;
+import chat.dim.filesys.LocalCache;
 import chat.dim.format.Base64;
 import chat.dim.format.DataCoder;
 import chat.dim.g1248.Client;
 import chat.dim.g1248.GlobalVariable;
 import chat.dim.g1248.PlayerOne;
-import chat.dim.http.HTTPClient;
 import chat.dim.mkm.User;
 import chat.dim.protocol.ID;
 import chat.dim.type.Triplet;
@@ -99,8 +99,9 @@ public final class GameApp extends Application {
         String path = Environment.getExternalStorageDirectory().getAbsolutePath();
         path += File.separator + "chat.dim.game1248";
 
-        HTTPClient http = HTTPClient.getInstance();
-        http.setRoot(path);
+        Register.prepare();
+        LocalCache cache = LocalCache.getInstance();
+        cache.setRoot(path);
 
         // prepare plugins
         GlobalVariable shared = GlobalVariable.getInstance();

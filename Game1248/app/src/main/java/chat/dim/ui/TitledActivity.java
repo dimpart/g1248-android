@@ -40,7 +40,7 @@ import chat.dim.threading.MainThread;
 public abstract class TitledActivity extends AppCompatActivity implements Observer {
 
     private String originTitle = null;
-    public String serverState = null;
+    public SessionState sessionState = null;
 
     protected TitledActivity() {
         super();
@@ -60,26 +60,26 @@ public abstract class TitledActivity extends AppCompatActivity implements Observ
         String name = notification.name;
         Map info = notification.userInfo;
         if (NotificationNames.ServerStateChanged.equals(name)) {
-            serverState = (String) info.get("state");
+            sessionState = (SessionState) info.get("state");
             MainThread.call(this::refreshTitle);
         }
     }
 
     private void refreshTitle() {
         CharSequence status;
-        if (serverState == null) {
+        if (sessionState == null) {
             status = "...";
-        } else if (serverState.equals(SessionState.DEFAULT)) {
+        } else if (sessionState.equals(SessionState.Order.DEFAULT)) {
             status = getText(R.string.server_default);
-        } else if (serverState.equals(SessionState.CONNECTING)) {
+        } else if (sessionState.equals(SessionState.Order.CONNECTING)) {
             status = getText(R.string.server_connecting);
-        } else if (serverState.equals(SessionState.CONNECTED)) {
+        } else if (sessionState.equals(SessionState.Order.CONNECTED)) {
             status = getText(R.string.server_connected);
-        } else if (serverState.equals(SessionState.HANDSHAKING)) {
+        } else if (sessionState.equals(SessionState.Order.HANDSHAKING)) {
             status = getText(R.string.server_handshaking);
-        } else if (serverState.equals(SessionState.ERROR)) {
+        } else if (sessionState.equals(SessionState.Order.ERROR)) {
             status = getText(R.string.server_error);
-        } else if (serverState.equals(SessionState.RUNNING)) {
+        } else if (sessionState.equals(SessionState.Order.RUNNING)) {
             status = null;
         } else {
             status = "?";

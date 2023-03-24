@@ -8,7 +8,7 @@ public class StateMachine extends AutoMachine<StateMachine, StateTransition, Pla
     final PlayerOne theOne;
 
     public StateMachine(PlayerOne one) {
-        super(PlayerState.DEFAULT);
+        super();
         theOne = one;
         // init states
         PlayerState.Builder builder = createStateBuilder();
@@ -20,10 +20,6 @@ public class StateMachine extends AutoMachine<StateMachine, StateTransition, Pla
 
     protected PlayerState.Builder createStateBuilder() {
         return new PlayerState.Builder(new StateTransition.Builder());
-    }
-
-    private void addState(PlayerState state) {
-        setState(state.name, state);
     }
 
     @Override

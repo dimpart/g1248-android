@@ -2,7 +2,6 @@ package chat.dim.g1248;
 
 import chat.dim.fsm.BaseState;
 import chat.dim.fsm.State;
-import chat.dim.network.SessionState;
 
 /**
  *  Player State
@@ -17,16 +16,18 @@ import chat.dim.network.SessionState;
  */
 public class PlayerState extends BaseState<StateMachine, StateTransition> {
 
-    public static final String DEFAULT  = "default";
-    public static final String SEEKING  = "seeking";
-    public static final String PLAYING  = "playing";
-    public static final String WATCHING = "watching";
+    public enum Order {
+        DEFAULT,  // = 0
+        SEEKING,
+        PLAYING,
+        WATCHING
+    }
 
     public final String name;
 
-    PlayerState(String stateName) {
-        super();
-        name = stateName;
+    PlayerState(Order stateOrder) {
+        super(stateOrder.ordinal());
+        name = stateOrder.name();
     }
 
     @Override
@@ -36,18 +37,20 @@ public class PlayerState extends BaseState<StateMachine, StateTransition> {
 
     @Override
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        } else if (other instanceof SessionState) {
-            return ((SessionState) other).name.equals(name);
-        } else if (other instanceof String) {
-            return other.equals(name);
+        if (other instanceof PlayerState) {
+            if (this == other) {
+                return true;
+            }
+            PlayerState state = (PlayerState) other;
+            return state.index == index;
+        } else if (other instanceof PlayerState.Order) {
+            return ((PlayerState.Order) other).ordinal() == index;
         } else {
             return false;
         }
     }
-    public boolean equals(String other) {
-        return name.equals(other);
+    public boolean equals(Order other) {
+        return other.ordinal() == index;
     }
 
     @Override
@@ -61,12 +64,12 @@ public class PlayerState extends BaseState<StateMachine, StateTransition> {
     }
 
     @Override
-    public void onPause(StateMachine ctx) {
+    public void onPause(StateMachine ctx, long now) {
 
     }
 
     @Override
-    public void onResume(StateMachine ctx) {
+    public void onResume(StateMachine ctx, long now) {
 
     }
 
@@ -84,26 +87,26 @@ public class PlayerState extends BaseState<StateMachine, StateTransition> {
         }
 
         PlayerState getDefaultState() {
-            PlayerState state = new PlayerState(PlayerState.DEFAULT);
+            PlayerState state = new PlayerState(PlayerState.Order.DEFAULT);
             state.addTransition(stb.getDefaultSeekingTransition());
             return state;
         }
 
         PlayerState getSeekingState() {
-            PlayerState state = new PlayerState(PlayerState.SEEKING);
+            PlayerState state = new PlayerState(PlayerState.Order.SEEKING);
             state.addTransition(stb.getSeekingWatchingTransition());
             return state;
         }
 
         PlayerState getWatchingState() {
-            PlayerState state = new PlayerState(PlayerState.WATCHING);
+            PlayerState state = new PlayerState(PlayerState.Order.WATCHING);
             state.addTransition(stb.getWatchingSeekingTransition());
             state.addTransition(stb.getWatchingPlayingTransition());
             return state;
         }
 
         PlayerState getPlayingState() {
-            PlayerState state = new PlayerState(PlayerState.PLAYING);
+            PlayerState state = new PlayerState(PlayerState.Order.PLAYING);
             state.addTransition(stb.getPlayingSeekingTransition());
             state.addTransition(stb.getPlayingWatchingTransition());
             return state;

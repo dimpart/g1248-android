@@ -68,20 +68,20 @@ public class Client extends Terminal {
     }
 
     @Override
-    public void exitState(SessionState previous, StateMachine ctx) {
-        super.exitState(previous, ctx);
+    public void exitState(SessionState previous, StateMachine ctx, long now) {
+        super.exitState(previous, ctx, now);
         // called after state changed
         SessionState current = ctx.getCurrentState();
         if (current == null) {
             return;
-        } else if (current.equals(SessionState.RUNNING)) {
+        } else if (current.equals(SessionState.Order.RUNNING)) {
             // request rooms for hall view
             PlayerOne theOne = PlayerOne.getInstance();
             theOne.sendSeeking(0, 20);
         }
 
         Map<String, Object> info = new HashMap<>();
-        info.put("state", current.name);
+        info.put("state", current);
         NotificationCenter nc = NotificationCenter.getInstance();
         nc.postNotification(NotificationNames.ServerStateChanged, this, info);
     }

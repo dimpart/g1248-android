@@ -95,7 +95,7 @@ public enum PlayerOne implements Delegate<StateMachine, StateTransition, PlayerS
         }
         ClientSession session = messenger.getSession();
         ID uid = session.getIdentifier();
-        if (uid == null || !sessionState.equals(SessionState.RUNNING)) {
+        if (uid == null || !sessionState.equals(SessionState.Order.RUNNING)) {
             // handshake not accepted
             return null;
         }
@@ -275,22 +275,22 @@ public enum PlayerOne implements Delegate<StateMachine, StateTransition, PlayerS
     //
 
     @Override
-    public void enterState(PlayerState next, StateMachine ctx) {
+    public void enterState(PlayerState next, StateMachine ctx, long now) {
         // called before state changed
     }
 
     @Override
-    public void exitState(PlayerState previous, StateMachine ctx) {
+    public void exitState(PlayerState previous, StateMachine ctx, long now) {
         // called after state changed
         PlayerState current = ctx.getCurrentState();
         Log.info("player state changed: " + previous + " => " + current);
         if (current == null) {
             return;
         }
-        if (current.equals(PlayerState.SEEKING)) {
+        if (current.equals(PlayerState.Order.SEEKING)) {
             // send request to the bot
             sendSeeking(0, 20);
-        } else if (current.equals(PlayerState.WATCHING)) {
+        } else if (current.equals(PlayerState.Order.WATCHING)) {
             // TODO: previous == PLAYING?
             // send request to the bot
             Room watchRoom = room;
@@ -302,12 +302,12 @@ public enum PlayerOne implements Delegate<StateMachine, StateTransition, PlayerS
     }
 
     @Override
-    public void pauseState(PlayerState current, StateMachine ctx) {
+    public void pauseState(PlayerState current, StateMachine ctx, long now) {
 
     }
 
     @Override
-    public void resumeState(PlayerState current, StateMachine ctx) {
+    public void resumeState(PlayerState current, StateMachine ctx, long now) {
 
     }
 }

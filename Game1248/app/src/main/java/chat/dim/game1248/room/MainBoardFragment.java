@@ -77,14 +77,14 @@ public class MainBoardFragment extends BoardFragment {
         PlayerOne theOne = PlayerOne.getInstance();
         PlayerState playerState = theOne.getCurrentState();
         if (playerState != null) {
-            if (playerState.equals(PlayerState.DEFAULT)) {
+            if (playerState.equals(PlayerState.Order.DEFAULT)) {
                 // TODO: show message to user
                 Log.warning("failed to create local user?");
-            } else if (playerState.equals(PlayerState.SEEKING)) {
+            } else if (playerState.equals(PlayerState.Order.SEEKING)) {
                 // 'seeking'
                 Log.error("should not happen: " + playerState);
                 return;
-            } else if (playerState.equals(PlayerState.WATCHING)) {
+            } else if (playerState.equals(PlayerState.Order.WATCHING)) {
                 // 'watching'
                 Log.warning("the player one is watching, cannot play game");
                 return;

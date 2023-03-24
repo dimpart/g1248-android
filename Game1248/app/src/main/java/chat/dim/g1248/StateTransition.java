@@ -39,8 +39,8 @@ import chat.dim.protocol.ID;
  */
 abstract class StateTransition extends BaseTransition<StateMachine> {
 
-    StateTransition(String target) {
-        super(target);
+    StateTransition(PlayerState.Order order) {
+        super(order.ordinal());
     }
 
     /**
@@ -54,7 +54,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
          *  ~~~~~~~~~~~~~~~~~~
          */
         StateTransition getDefaultSeekingTransition() {
-            return new StateTransition(PlayerState.SEEKING) {
+            return new StateTransition(PlayerState.Order.SEEKING) {
                 @Override
                 public boolean evaluate(StateMachine ctx, long now) {
                     return ctx.theOne.user != null;
@@ -67,7 +67,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
          *  ~~~~~~~~~~~~~~~~~~~
          */
         StateTransition getSeekingWatchingTransition() {
-            return new StateTransition(PlayerState.WATCHING) {
+            return new StateTransition(PlayerState.Order.WATCHING) {
                 @Override
                 public boolean evaluate(StateMachine ctx, long now) {
                     return ctx.theOne.room != null;
@@ -80,7 +80,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
          *  ~~~~~~~~~~~~~~~~~~~
          */
         StateTransition getWatchingSeekingTransition() {
-            return new StateTransition(PlayerState.SEEKING) {
+            return new StateTransition(PlayerState.Order.SEEKING) {
                 @Override
                 public boolean evaluate(StateMachine ctx, long now) {
                     return ctx.theOne.room == null;
@@ -93,7 +93,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
          *  ~~~~~~~~~~~~~~~~~~~
          */
         StateTransition getWatchingPlayingTransition() {
-            return new StateTransition(PlayerState.PLAYING) {
+            return new StateTransition(PlayerState.Order.PLAYING) {
                 @Override
                 public boolean evaluate(StateMachine ctx, long now) {
                     Board board = ctx.theOne.board;
@@ -111,7 +111,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
          *  ~~~~~~~~~~~~~~~~~~
          */
         StateTransition getPlayingSeekingTransition() {
-            return new StateTransition(PlayerState.SEEKING) {
+            return new StateTransition(PlayerState.Order.SEEKING) {
                 @Override
                 public boolean evaluate(StateMachine ctx, long now) {
                     return ctx.theOne.room == null;
@@ -124,7 +124,7 @@ abstract class StateTransition extends BaseTransition<StateMachine> {
          *  ~~~~~~~~~~~~~~~~~~~
          */
         StateTransition getPlayingWatchingTransition() {
-            return new StateTransition(PlayerState.WATCHING) {
+            return new StateTransition(PlayerState.Order.WATCHING) {
                 @Override
                 public boolean evaluate(StateMachine ctx, long now) {
                     Board board = ctx.theOne.board;

@@ -33,6 +33,7 @@ package chat.dim.database;
 import java.util.Date;
 
 import chat.dim.dbi.DocumentDBI;
+import chat.dim.filesys.DocumentStorage;
 import chat.dim.mem.CacheHolder;
 import chat.dim.mem.CacheManager;
 import chat.dim.mem.CachePair;

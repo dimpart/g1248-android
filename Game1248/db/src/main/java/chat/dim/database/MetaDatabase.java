@@ -31,6 +31,7 @@
 package chat.dim.database;
 
 import chat.dim.dbi.MetaDBI;
+import chat.dim.filesys.MetaStorage;
 import chat.dim.mem.CacheHolder;
 import chat.dim.mem.CacheManager;
 import chat.dim.mem.CachePair;
